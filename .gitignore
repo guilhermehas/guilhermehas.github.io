@@ -4,6 +4,7 @@
 *.swo
 *.swp
 *~
+*.agdai
 .DS_Store
 TAGS
 dist
@@ -20,6 +21,7 @@ tests/Main
 _cache
 _store
 _site
+_agda
 
 # Rest of the file: ignore examples
 web/_cache
