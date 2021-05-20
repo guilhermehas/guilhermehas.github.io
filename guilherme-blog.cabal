@@ -7,6 +7,10 @@ executable site
   main-is:          site.hs
   build-depends:    base == 4.*
                   , hakyll == 4.14.*
-                  , hakyll-agda
+                  , pandoc >= 2.2
+                  , filepath >= 1.4
+                  , directory >= 1.3
+                  , process >= 1.4.3
+                  , extra >= 1.6
   ghc-options:      -threaded
   default-language: Haskell2010
