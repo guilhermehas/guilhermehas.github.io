@@ -7,24 +7,41 @@
     flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
     let
       overlays = [ haskellNix.overlay
-        (final: prev: {
+        (final: prev: 
+          let src-debug = prev.fetchFromGitHub {
+            owner = "guilhermehas";
+            repo = "guilherme-blog";
+            rev = "3df5ec5562de8cb751a1dd2c6c132d48d42faa21";
+            sha256 = "07c4zn6kmgc0ivl9hw9s81msnrph2jrmc79xvdnwmmll7wrr365k";
+          }; in rec {
           # This overlay adds our project to pkgs
-          helloProject =
+          blogToolsProject =
             final.haskell-nix.project' {
               src = ./.;
               compiler-nix-name = "ghc8104";
             };
+          blogProject = with prev; stdenv.mkDerivation {
+            name = "guilhermee-blog";
+            src = ./.;
+            buildInputs = [ agda (final.blogToolsProject.getComponent "guilherme-blog:exe:site") ];
+
+            buildPhase = ''site build'';
+            installPhase = ''cp -r _site $out'';
+          };
         })
       ];
       pkgs = import nixpkgs { inherit system overlays; };
-      flake = pkgs.helloProject.flake {};
+      flake = pkgs.blogToolsProject.flake {};
+      blogProject = pkgs.blogProject;
     in flake // {
       # Built by `nix build .`
-      defaultPackage = flake.packages."guilherme-blog:exe:site";
+      packages = [ blogProject ];
+      defaultPackage = blogProject;
+      # defaultPackage = flake.packages."guilherme-blog:exe:site";
 
       # This is used by `nix develop .` to open a shell for use with
       # `cabal`, `hlint` and `haskell-language-server`
-      devShell = pkgs.helloProject.shellFor {
+      devShell = pkgs.blogToolsProject.shellFor {
         tools = {
           cabal = "latest";
           hlint = "latest";
