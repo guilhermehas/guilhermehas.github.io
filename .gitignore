@@ -15,6 +15,7 @@ cabal.sandbox.config
 dist
 dist-*
 .ghc.environment.*
+result*
 
 # Ignore test builds.
 tests/Main
