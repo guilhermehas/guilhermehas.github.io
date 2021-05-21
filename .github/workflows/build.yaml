@@ -11,8 +11,8 @@ jobs:
             mkdir -p ~/.config/nix/
             echo ' 
               experimental-features = nix-command flakes
-              extra-trusted-substituters = https://cache.nixos.org/ https://hydra.iohk.io
-              extra-trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=' > ~/.config/nix/nix.conf
+              substituters = https://cache.nixos.org/ https://hydra.iohk.io
+              trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ=' > ~/.config/nix/nix.conf
             nix build -v --print-build-logs
         - uses: peaceiris/actions-gh-pages@v3
           with:
