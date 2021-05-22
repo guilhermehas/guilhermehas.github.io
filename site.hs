@@ -138,8 +138,7 @@ agdaOutputDir = "_agda"
 
 agdaOptions :: String -> [String]
 agdaOptions fileName =
-  [ "--no-libraries"
-  , "--html"
+  [ "--html"
   , "--html-highlight=auto"
   , "--html-dir=" ++ agdaOutputDir
   , "-i" ++ agdaInputDir
