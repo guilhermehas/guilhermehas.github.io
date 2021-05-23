@@ -12,7 +12,8 @@ author: Guilherme
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.SetTruncation
 open import Cubical.Foundations.HLevels
-open import Cubical.Foundations.Isomorphism using (Iso; isoToPath)
+open import Cubical.Foundations.Isomorphism
+  using (Iso; isoToPath)
 open import Cubical.Relation.Nullary.Base
 open import Cubical.Relation.Nullary.Properties
 open import Cubical.Data.Empty as ⊥
@@ -83,7 +84,8 @@ To use them, it is good to have eliminators:
 module Elim {ℓ'} {B : N → Type ℓ'}
   (one* : B one) (_+*_ : {m n : N} → B m → B n → B (m + n))
   (assoc* : {x y z : N} (x' : B x) (y' : B y) (z' : B z)
-            → PathP (λ i → B (assoc x y z i)) ((x' +* y') +* z') (x' +* (y' +* z')))
+            → PathP (λ i → B (assoc x y z i))
+            ((x' +* y') +* z') (x' +* (y' +* z')))
   (trunc* : (n : N) → isSet (B n)) where
 
   f : (n : N) → B n
@@ -91,7 +93,8 @@ module Elim {ℓ'} {B : N → Type ℓ'}
   f (m + n) = f m +* f n
   f (assoc x y z i) = assoc* (f x) (f y) (f z) i
   f (trunc m n p q i j) =
-    isOfHLevel→isOfHLevelDep 2 trunc* (f m) (f n) (cong f p) (cong f q) (trunc m n p q) i j
+    isOfHLevel→isOfHLevelDep 2 trunc* (f m) (f n)
+    (cong f p) (cong f q) (trunc m n p q) i j
 
 module ElimProp {ℓ'} {B : N → Type ℓ'} (BProp : {n : N} → isProp (B n))
   (one* : B one) (_+*_ : {m n : N} → B m → B n → B (m + n)) where
@@ -99,7 +102,8 @@ module ElimProp {ℓ'} {B : N → Type ℓ'} (BProp : {n : N} → isProp (B n))
   f : (n : N) → B n
   f = Elim.f {B = B} one* _+*_
         (λ {x} {y} {z} x' y' z' →
-          toPathP (BProp (transp (λ i → B (assoc x y z i)) i0 ((x' +* y') +* z')) (x' +* (y' +* z'))))
+          toPathP (BProp (transp (λ i → B (assoc x y z i)) i0
+          ((x' +* y') +* z')) (x' +* (y' +* z'))))
         λ n → isProp→isSet BProp
 
 module Rec {ℓ'} {B : Type ℓ'} (BType : isSet B)
@@ -166,7 +170,8 @@ to (s a) = one + to a
 from one = one'
 from (a + b) = from a +' from b
 from (assoc a b c i) = assoc' (from a) (from b) (from c) i
-from (trunc m n p q i j) = N'-Set _ _ (λ k → from (p k)) (λ k → from (q k)) i j
+from (trunc m n p q i j) =
+  N'-Set _ _ (λ k → from (p k)) (λ k → from (q k)) i j
 
 from∘to one' i = one'
 from∘to (s a) i = s (from∘to a i)
@@ -211,5 +216,6 @@ to∘from = ElimProp.f (trunc _ _) (λ i → one)
   λ {a} {b} m n → add-lemma (from a) (from b) ∙ (λ i → m i + n i)
 
 add-lemma one' b = refl
-add-lemma (s a) b = (λ i → one + (add-lemma a b i)) ∙ sym (assoc one (to a) (to b))
+add-lemma (s a) b = (λ i → one + (add-lemma a b i))
+  ∙ sym (assoc one (to a) (to b))
 ```
