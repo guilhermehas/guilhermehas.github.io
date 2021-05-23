@@ -28,6 +28,13 @@ main = do
     processAgdaPosts
     hakyllMain
 
+allPosts :: Compiler [Item String]
+allPosts = do
+    plainPosts <- loadAll "posts/*"
+    agdaPosts  <- loadAll $ fromString (agdaOutputDir </> "*.md")
+    recentFirst $ plainPosts ++ agdaPosts
+
+
 hakyllMain :: IO ()
 hakyllMain = hakyll $ (>>)<*>id $ do
     match "images/*" $ do
@@ -74,7 +81,7 @@ hakyllMain = hakyll $ (>>)<*>id $ do
     create ["archive.html"] $ do
         route idRoute
         compile $ do
-            posts <- recentFirst =<< loadAll "posts/*"
+            posts <- allPosts
             let archiveCtx =
                     listField "posts" postCtx (return posts) `mappend`
                     constField "title" "Archives"            `mappend`
@@ -89,9 +96,7 @@ hakyllMain = hakyll $ (>>)<*>id $ do
     match "index.html" $ do
         route idRoute
         compile $ do
-            plainPosts <- loadAll "posts/*"
-            agdaPosts  <- loadAll $ fromString (agdaOutputDir </> "*.md")
-            posts <- recentFirst $ plainPosts ++ agdaPosts
+            posts <- allPosts
             let indexCtx =
                     listField "posts" postCtx (return posts) `mappend`
                     defaultContext
