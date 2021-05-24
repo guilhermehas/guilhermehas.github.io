@@ -3,10 +3,12 @@
   inputs.haskellNix.url = "github:input-output-hk/haskell.nix";
   inputs.nixpkgs.follows = "haskellNix/nixpkgs-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
-  outputs = { self, nixpkgs, flake-utils, haskellNix }:
+  inputs.agda.url = "github:guilhermehas/all-agda";
+
+  outputs = { self, nixpkgs, flake-utils, haskellNix, agda }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
     let
-      overlays = [ haskellNix.overlay
+      overlays = [ agda.overlay ] ++ [ haskellNix.overlay
         (final: prev:
           let src-debug = prev.fetchFromGitHub {
             owner = "guilhermehas";
@@ -25,7 +27,8 @@
           blogProject = with prev; stdenv.mkDerivation {
             name = "guilhermee-blog";
             src = my-src;
-            buildInputs = [ agda (final.blogToolsProject.getComponent "guilherme-blog:exe:site") ];
+            buildInputs = [ (prev.agda-master.withPackages (p: with p; [ cubical ]))
+                            (final.blogToolsProject.getComponent "guilherme-blog:exe:site") ];
 
             buildPhase = ''site build'';
             installPhase = ''cp -r _site $out'';

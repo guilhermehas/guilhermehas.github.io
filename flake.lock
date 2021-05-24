@@ -1,5 +1,24 @@
 {
   "nodes": {
+    "agda": {
+      "inputs": {
+        "haskellNix": "haskellNix",
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1619612806,
+        "narHash": "sha256-YW+7MvxQdAbGVY4emmxtoxpF2N6CpZSbBZ1cq5i6ubQ=",
+        "owner": "guilhermehas",
+        "repo": "all-agda",
+        "rev": "9d2c601128938b8dad24b225daa0a559a088da05",
+        "type": "github"
+      },
+      "original": {
+        "owner": "guilhermehas",
+        "repo": "all-agda",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "locked": {
         "lastModified": 1620759905,
@@ -16,8 +35,23 @@
       }
     },
     "haskellNix": {
+      "locked": {
+        "lastModified": 1611364349,
+        "narHash": "sha256-Lwqa5oN0NTNWQBV8aUUmzllfAjVfyNSzEHQL8/IH/zc=",
+        "owner": "input-output-hk",
+        "repo": "haskell.nix",
+        "rev": "3439d7519ed6154f4695d4508c44ef7ceab4285c",
+        "type": "github"
+      },
+      "original": {
+        "owner": "input-output-hk",
+        "repo": "haskell.nix",
+        "type": "github"
+      }
+    },
+    "haskellNix_2": {
       "inputs": {
-        "nixpkgs": "nixpkgs",
+        "nixpkgs": "nixpkgs_2",
         "nixpkgs-2003": "nixpkgs-2003",
         "nixpkgs-2009": "nixpkgs-2009",
         "nixpkgs-unstable": "nixpkgs-unstable"
@@ -38,17 +72,17 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1608007629,
-        "narHash": "sha256-lipVFC/a2pzzA5X2ULj64je+fz1JIp2XRrB5qyoizpQ=",
-        "owner": "NixOS",
+        "lastModified": 1611219034,
+        "narHash": "sha256-bgp8G3LcpvKs22/z5Cj4XQkmZq05Aa0vaP1bKl7X0zM=",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "f02bf8ffb9a5ec5e8f6f66f1e5544fd2aa1a0693",
+        "rev": "f217c0ea7c148ddc0103347051555c7c252dcafb",
         "type": "github"
       },
       "original": {
-        "owner": "NixOS",
+        "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "f02bf8ffb9a5ec5e8f6f66f1e5544fd2aa1a0693",
+        "rev": "f217c0ea7c148ddc0103347051555c7c252dcafb",
         "type": "github"
       }
     },
@@ -100,10 +134,27 @@
         "type": "github"
       }
     },
+    "nixpkgs_2": {
+      "locked": {
+        "lastModified": 1608007629,
+        "narHash": "sha256-lipVFC/a2pzzA5X2ULj64je+fz1JIp2XRrB5qyoizpQ=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "f02bf8ffb9a5ec5e8f6f66f1e5544fd2aa1a0693",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "f02bf8ffb9a5ec5e8f6f66f1e5544fd2aa1a0693",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
+        "agda": "agda",
         "flake-utils": "flake-utils",
-        "haskellNix": "haskellNix",
+        "haskellNix": "haskellNix_2",
         "nixpkgs": [
           "haskellNix",
           "nixpkgs-unstable"
