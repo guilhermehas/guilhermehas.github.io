@@ -146,7 +146,6 @@ agdaOptions fileName =
   [ "--html"
   , "--html-highlight=auto"
   , "--html-dir=" ++ agdaOutputDir
-  , "-i" ++ agdaInputDir
   , agdaInputDir </> fileName
   ]
 
