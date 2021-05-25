@@ -16,6 +16,7 @@ dist
 dist-*
 .ghc.environment.*
 result*
+html
 
 # Ignore test builds.
 tests/Main
