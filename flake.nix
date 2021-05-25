@@ -40,7 +40,7 @@
       blogProject = pkgs.blogProject;
     in flake // {
       # Built by `nix build .`
-      packages = [ blogProject ];
+      packages = flake.packages // { inherit blogProject; };
       defaultPackage = blogProject;
       # defaultPackage = flake.packages."guilherme-blog:exe:site";
 
