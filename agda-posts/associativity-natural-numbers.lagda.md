@@ -4,8 +4,6 @@ title: Defining Natural Numbers using its associativity property
 author: Guilherme
 ---
 
-# Defining Natural Numbers using its associativity property
-
 ```
 {-# OPTIONS --cubical #-}
 
