@@ -1,14 +1,27 @@
 ---
-date: 2021-05-22
-title: Defining Natural Numbers using its associativity property
+date: 2021-05-26
+title: Defining Natural Numbers using its associativity property in Agda
 author: Guilherme
 ---
+
+# Motivation
+
+When I was looking at how to do simple addition in decimal, I saw that we use the associativity property of natural numbers.
+For example, `15 + 26 ≡ (10 + 5) + (20 + 6) ≡ 10 + 20 + (5 + 6) ≡ (10 + 20 + 10) + 1 ≡ 40 + 1 ≡ 41`.
+And another property that I saw is that it was always possible with just the associativity property to transform any addition to `1+(1+(1+...))`.
+In Cubical Type Theory, there are quotient types. Because of that, it is possible to create natural numbers with associativity property in their types.
+So I will use it to prove that natural numbers without zero can be defined using their associativity property.
+
+# Imports
+
+Importing Cubical Libraries:
 
 ```
 {-# OPTIONS --cubical #-}
 
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.SetTruncation
+open import Cubical.HITs.S1
 open import Cubical.Foundations.HLevels
 open import Cubical.Foundations.Isomorphism
   using (Iso; isoToPath)
@@ -16,7 +29,13 @@ open import Cubical.Relation.Nullary.Base
 open import Cubical.Relation.Nullary.Properties
 open import Cubical.Data.Empty as ⊥
 open import Cubical.Data.Unit renaming (Unit to ⊤)
+open import Cubical.Data.Bool
+open import Cubical.Data.Int hiding (_+_; _+'_)
+import Cubical.Data.Nat using (snotz; ℕ)
+open Cubical.Data.Nat renaming (ℕ to ℕ')
 ```
+
+# Defintion
 
 The natural numbers are defined using Peano axioms. So a natural number can be zero or the successor of another natural number.
 
@@ -66,7 +85,58 @@ In cubical type theory, there are high inductive types (HITs), so two equalities
     o+[o+[o+o]] ∎
 ```
 
-Because of this problem, in Cubical Type Theory, it is usually necessary to truncate the Set. So the natural numbers will be defined in this way:
+Now, I will prove that both of these equalities (`o≡[o]₁` and `o≡[o]₂`) are different:
+
+```
+  parity : N → Bool
+  parity one = true
+  parity (n + m) = parity n ⊕ parity m
+  parity (assoc n m l i) = sym (⊕-assoc (parity n) (parity m) (parity l)) i
+
+  _ : parity (one + one) ≡ false
+  _ = refl
+
+  _ : ∀ i → parity (assoc one one one i) ≡ true
+  _ = λ i → refl
+
+  model : N → S¹
+  model one = base
+  model (_ + _) = base
+  model (assoc x _ _ i) = (if parity x then refl else loop) i
+
+  toΩS¹ : o≡[o] → ΩS¹
+  toΩS¹ = cong model
+
+  toInt : o≡[o] → Int
+  toInt p = winding (toΩS¹ p)
+
+  o≡[o]₁-Int : toInt o≡[o]₁ ≡ pos 1
+  o≡[o]₁-Int = refl
+
+  o≡[o]₂-Int : toInt o≡[o]₂ ≡ pos 0
+  o≡[o]₂-Int = refl
+
+  _≠_ : ∀ {ℓ} {A : Set ℓ} → A → A → _
+  x ≠ y = ¬ (x ≡ y)
+
+  f : o≡[o] → ℕ'
+  f n = abs (toInt n)
+
+  _ : f o≡[o]₁ ≡ 1
+  _ = refl
+
+  _ : f o≡[o]₂ ≡ 0
+  _ = refl
+
+  o≡[o]₁≠o≡[o]₂ : o≡[o]₁ ≠ o≡[o]₂
+  o≡[o]₁≠o≡[o]₂ p = snotz (cong f p)
+```
+
+The secret to prove it is to try to find a function `f` that goes from each equality to a different value.
+In the code above, the first equality (`o≡[o]₁`) goes to 1 while the second (o≡[o]₂) goes to 0.
+So proving that `f o≡[o]₁ ≠ f o≡[o]₂`, I got `o≡[o]₁ ≠ o≡[o]₂`.
+
+Because of the problem that two equalities are not always the same in Cubical Type Theory, it is usually necessary to truncate the Set. So the natural numbers will be defined in this way:
 
 ```
 data N : Set where
