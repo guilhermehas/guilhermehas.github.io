@@ -19,6 +19,7 @@ Importing Cubical Libraries:
 ```
 {-# OPTIONS --cubical #-}
 
+open import Agda.Primitive
 open import Cubical.Foundations.Prelude
 open import Cubical.HITs.SetTruncation
 open import Cubical.HITs.S1
@@ -31,8 +32,14 @@ open import Cubical.Data.Empty as ⊥
 open import Cubical.Data.Unit renaming (Unit to ⊤)
 open import Cubical.Data.Bool
 open import Cubical.Data.Int hiding (_+_; _+'_)
-import Cubical.Data.Nat using (snotz; ℕ)
-open Cubical.Data.Nat renaming (ℕ to ℕ')
+open import Cubical.Data.Nat hiding (_+_)
+```
+
+To use it later:
+
+```
+_≠_ : ∀ {ℓ} {A : Set ℓ} → A → A → _
+x ≠ y = ¬ (x ≡ y)
 ```
 
 # Defintion
@@ -40,9 +47,9 @@ open Cubical.Data.Nat renaming (ℕ to ℕ')
 The natural numbers are defined using Peano axioms. So a natural number can be zero or the successor of another natural number.
 
 ```
-data ℕ : Set where
-  zero : ℕ
-  suc  : ℕ
+data ℕ' : Set where
+  zero' : ℕ'
+  suc'  : ℕ' → ℕ'
 ```
 
 But it can also be defined using its associativity property. I will define it starting from one and I will show why this definition is wrong:
@@ -90,8 +97,8 @@ Now, I will prove that both of these equalities (`o≡[o]₁` and `o≡[o]₂`) 
 ```
   parity : N → Bool
   parity one = true
-  parity (n + m) = parity n ⊕ parity m
-  parity (assoc n m l i) = sym (⊕-assoc (parity n) (parity m) (parity l)) i
+  parity (m + n) = parity m ⊕ parity n
+  parity (assoc m n l i) = sym (⊕-assoc (parity m) (parity n) (parity l)) i
 
   _ : parity (one + one) ≡ false
   _ = refl
@@ -116,10 +123,8 @@ Now, I will prove that both of these equalities (`o≡[o]₁` and `o≡[o]₂`) 
   o≡[o]₂-Int : toInt o≡[o]₂ ≡ pos 0
   o≡[o]₂-Int = refl
 
-  _≠_ : ∀ {ℓ} {A : Set ℓ} → A → A → _
-  x ≠ y = ¬ (x ≡ y)
 
-  f : o≡[o] → ℕ'
+  f : o≡[o] → ℕ
   f n = abs (toInt n)
 
   _ : f o≡[o]₁ ≡ 1
@@ -139,14 +144,47 @@ So proving that `f o≡[o]₁ ≠ f o≡[o]₂`, I got `o≡[o]₁ ≠ o≡[o]�
 Because of the problem that two equalities are not always the same in Cubical Type Theory, it is usually necessary to truncate the Set. So the natural numbers will be defined in this way:
 
 ```
+infixl 6 _+_
 data N : Set where
   one : N
   _+_ : N → N → N
-  assoc : (a b c : N) → (a + b) + c ≡ a + (b + c)
+  assoc : (a b c : N) → a + b + c ≡ a + (b + c)
   trunc : isSet N
 ```
 
-To use them, it is good to have eliminators:
+In Agda, it is possible to overload the natural numbers. So when I write `1`, it will be 1; when I write `2`, it will be `one + one` and so on.
+I will define the overload for this Natural:
+
+```
+open import Cubical.Data.Nat.Literals public
+
+constraintNumber : ℕ → Set
+constraintNumber zero = ⊥
+constraintNumber (suc n) = ⊤
+
+fromNat' : (n : ℕ) ⦃ c : constraintNumber n ⦄ → N
+fromNat' zero ⦃ () ⦄
+fromNat' (suc zero) ⦃ c ⦄ = one
+fromNat' (suc (suc n)) ⦃ c ⦄ = fromNat' (suc n) + one
+
+instance
+  NumN : HasFromNat N
+  NumN = record { Constraint = constraintNumber ; fromNat = fromNat' }
+
+idN : N → N
+idN n = n
+
+_ : idN 1 ≡ one
+_ = refl
+
+_ : idN 2 ≡ one + one
+_ = refl
+
+_ : idN 3 ≡ one + one + one
+_ = refl
+```
+
+To use these natural numbers, it is good to have eliminators:
 
 ```
 module Elim {ℓ'} {B : N → Type ℓ'}
@@ -232,8 +270,8 @@ I will assume that the Peano natural numbers are a set and I will prove the easi
 ```
 N'-Set : isSet N'
 
-to one' = one
-to (s a) = one + to a
+to one' = 1
+to (s a) = 1 + to a
 
 from one = one'
 from (a + b) = from a +' from b
@@ -286,4 +324,22 @@ to∘from = ElimProp.f (trunc _ _) (λ i → one)
 add-lemma one' b = refl
 add-lemma (s a) b = (λ i → one + (add-lemma a b i))
   ∙ sym (assoc one (to a) (to b))
+```
+
+# Applications
+
+## Vectors
+
+In the same way that natural numbers are defined using their associativity property, vectors can also be defined in this way:
+
+```
+infixl 20 _++_
+data Vec (A : Set) : N → Set where
+  [_] : A → Vec A one
+  _++_ : ∀ {m n} (xs : Vec A m) (ys : Vec A n) → Vec A (m + n)
+  assoc : ∀ {m n p} (xs : Vec A m) (ys : Vec A n) (zs : Vec A p) → PathP (λ i → Vec A (assoc m n p i)) (xs ++ ys ++ zs) (xs ++ (ys ++ zs))
+  isSetVec : ∀ {n} → isSet (Vec A n)
+
+exVec₁ : Vec N 1
+exVec₁ = [ 1 ]
 ```
