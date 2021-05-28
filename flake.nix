@@ -1,9 +1,11 @@
 {
   description = "A very basic flake";
-  inputs.haskellNix.url = "github:input-output-hk/haskell.nix";
-  inputs.nixpkgs.follows = "haskellNix/nixpkgs-unstable";
-  inputs.flake-utils.url = "github:numtide/flake-utils";
-  inputs.agda.url = "github:guilhermehas/all-agda";
+  inputs = {
+    haskellNix.url = "github:input-output-hk/haskell.nix";
+    nixpkgs.follows = "haskellNix/nixpkgs-unstable";
+    flake-utils.url = "github:numtide/flake-utils";
+    agda.url = "github:guilhermehas/all-agda";
+  };
 
   outputs = { self, nixpkgs, flake-utils, haskellNix, agda }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
@@ -24,10 +26,11 @@
               src = my-src;
               compiler-nix-name = "ghc8104";
             };
+          agda-cubical = prev.agda-master.withPackages (p: with p; [ cubical ]);
           blogProject = with prev; stdenv.mkDerivation {
             name = "guilhermee-blog";
             src = my-src;
-            buildInputs = [ (prev.agda-master.withPackages (p: with p; [ cubical ]))
+            buildInputs = [ final.agda-cubical
                             (final.blogToolsProject.getComponent "guilherme-blog:exe:site") ];
 
             buildPhase = ''site build'';
@@ -52,6 +55,10 @@
           hlint = "latest";
           haskell-language-server = "latest";
         };
+        buildInputs = with pkgs; [
+          agda-cubical
+          (blogToolsProject.getComponent "guilherme-blog:exe:site")
+        ];
       };
     });
 }
