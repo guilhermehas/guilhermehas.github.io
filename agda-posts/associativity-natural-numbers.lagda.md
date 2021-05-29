@@ -160,12 +160,12 @@ open import Cubical.Data.Nat.Literals public
 
 constraintNumber : ℕ → Set
 constraintNumber zero = ⊥
-constraintNumber (suc n) = ⊤
+constraintNumber (suc _) = ⊤
 
-fromNat' : (n : ℕ) ⦃ c : constraintNumber n ⦄ → N
+fromNat' : (n : ℕ) ⦃ _ : constraintNumber n ⦄ → N
 fromNat' zero ⦃ () ⦄
-fromNat' (suc zero) ⦃ c ⦄ = one
-fromNat' (suc (suc n)) ⦃ c ⦄ = fromNat' (suc n) + one
+fromNat' (suc zero) = one
+fromNat' (suc (suc n)) = fromNat' (suc n) + one
 
 instance
   NumN : HasFromNat N
@@ -279,7 +279,7 @@ from (assoc a b c i) = assoc' (from a) (from b) (from c) i
 from (trunc m n p q i j) =
   N'-Set _ _ (λ k → from (p k)) (λ k → from (q k)) i j
 
-from∘to one' i = one'
+from∘to one' _ = one'
 from∘to (s a) i = s (from∘to a i)
 ```
 
@@ -303,7 +303,7 @@ suc-eq eq i = dec (eq i)
 
 P : N' -> Set
 P one' = ⊤
-P (s n) = ⊥
+P (s _) = ⊥
 
 N'-Discrete one' one' = yes λ i → one'
 N'-Discrete one' (s n) = no λ eq → transport (λ j → P (eq j)) tt
@@ -343,4 +343,7 @@ data Vec (A : Set) : N → Set where
 
 exVec₁ : Vec N 1
 exVec₁ = [ 1 ]
+
+exVec₂ : Vec N 3
+exVec₂ = [ 3 ] ++ [ 2 ] ++ [ 1 ]
 ```
