@@ -152,8 +152,8 @@ data N : Set where
   trunc : isSet N
 ```
 
-In Agda, it is possible to overload the natural numbers. So when I write `1`, it will be 1; when I write `2`, it will be `one + one` and so on.
-I will define the overload for this Natural:
+In Agda, it is possible to overload the natural numbers. So when I write `1`, it will be `one`; when I write `2`, it will be `one + one` and so on.
+I will define the overload for this Natural number:
 
 ```
 open import Cubical.Data.Nat.Literals public
@@ -337,7 +337,8 @@ infixl 20 _++_
 data Vec (A : Set) : N → Set where
   [_] : A → Vec A one
   _++_ : ∀ {m n} (xs : Vec A m) (ys : Vec A n) → Vec A (m + n)
-  assoc : ∀ {m n p} (xs : Vec A m) (ys : Vec A n) (zs : Vec A p) → PathP (λ i → Vec A (assoc m n p i)) (xs ++ ys ++ zs) (xs ++ (ys ++ zs))
+  assoc : ∀ {m n p} (xs : Vec A m) (ys : Vec A n) (zs : Vec A p)
+    → PathP (λ i → Vec A (assoc m n p i)) (xs ++ ys ++ zs) (xs ++ (ys ++ zs))
   isSetVec : ∀ {n} → isSet (Vec A n)
 
 exVec₁ : Vec N 1
