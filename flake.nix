@@ -1,5 +1,5 @@
 {
-  description = "A very basic flake";
+  description = "Guilherme blog";
   inputs = {
     haskellNix.url = "github:input-output-hk/haskell.nix";
     nixpkgs.follows = "haskellNix/nixpkgs-unstable";
@@ -28,7 +28,7 @@
             };
           agda-cubical = prev.agda-master.withPackages (p: with p; [ cubical ]);
           blogProject = with prev; stdenv.mkDerivation {
-            name = "guilhermee-blog";
+            name = "guilherme-blog";
             src = my-src;
             buildInputs = [ final.agda-cubical
                             (final.blogToolsProject.getComponent "guilherme-blog:exe:site") ];
