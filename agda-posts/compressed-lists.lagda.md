@@ -11,9 +11,7 @@ There is a simple problem of string compression that can be found in
 or in [LeetCode](https://leetcode.com/problems/string-compression/) that consists of compressing
 each element of string by the number of times that
 it appears. For example, "aa" is compressed to "a2" and "bbccc" is compressed to "b2c3".
-In this post, I will create a data structure in cubical agda that looks like the compressed
-and the uncompressed format.
-
+In this post, I will create a data structure in cubical Agda that has compressed and uncompressed formats.
 
 # Imports
 
