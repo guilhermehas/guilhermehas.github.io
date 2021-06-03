@@ -8,9 +8,9 @@ author: Guilherme
 
 When I was looking at how to do simple addition in decimal, I saw that we use the associativity property of natural numbers.
 For example, `15 + 26 ≡ (10 + 5) + (20 + 6) ≡ 10 + 20 + (5 + 6) ≡ (10 + 20 + 10) + 1 ≡ 40 + 1 ≡ 41`.
-And another property that I saw is that it was always possible with just the associativity property to transform any addition to `1+(1+(1+...))`.
-In Cubical Type Theory, there are quotient types. Because of that, it is possible to create natural numbers with associativity property in their types.
-So I will use it to prove that natural numbers without zero can be defined using their associativity property.
+In the following, I saw that it was always possible, with just the associativity property, to transform any addition to `1+(1+(1+...))`.
+In Cubical Type Theory, there are quotient types. Therefore, it is possible to create natural numbers with associativity property in their types.
+I will use this to prove that natural numbers without zero can be defined using their associativity property.
 
 # Imports
 
