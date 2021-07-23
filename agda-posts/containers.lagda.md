@@ -6,9 +6,10 @@ author: Guilherme
 
 # Motivation
 
-Containers are generic data structures and they can represent most of the Agda data types.
-The advantages of using them are to prove some properties of their data structure and generate some properties for them. With Agda reflection, it is possible to generate the container associated with the data structure and get the properties and associated structures for free (e.g. deriving a functor for the data types).
-[Agda Generic Library](https://github.com/effectfully/Generic) does exactly that, they get the data structure from reflection, transform it to containers, generate the equality for them and return the generated equality for the data structure.
+Containers are generic data structures that can represent most of the Agda data types.
+They enable one to prove properties of their data structure and also generate properties for them.
+With Agda reflection, it is possible to generate the container associated with the data structure and get the properties and associated structures for free (e.g. deriving a functor for the data types).
+[Agda Generic Library](https://github.com/effectfully/Generic) does exactly that, it gets the data structure from reflection, transform it to containers, generate the equality for them and return the generated equality for the data structure.
 
 # Imports
 
