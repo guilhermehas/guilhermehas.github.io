@@ -114,18 +114,18 @@ Now, I will prove that both of these equalities (`o≡[o]₁` and `o≡[o]₂`) 
   toΩS¹ : o≡[o] → ΩS¹
   toΩS¹ = cong model
 
-  toInt : o≡[o] → Int
-  toInt p = winding (toΩS¹ p)
+  toℤ : o≡[o] → ℤ
+  toℤ p = winding (toΩS¹ p)
 
-  o≡[o]₁-Int : toInt o≡[o]₁ ≡ pos 1
-  o≡[o]₁-Int = refl
+  o≡[o]₁-ℤ : toℤ o≡[o]₁ ≡ pos 1
+  o≡[o]₁-ℤ = refl
 
-  o≡[o]₂-Int : toInt o≡[o]₂ ≡ pos 0
-  o≡[o]₂-Int = refl
+  o≡[o]₂-ℤ : toℤ o≡[o]₂ ≡ pos 0
+  o≡[o]₂-ℤ = refl
 
 
   f : o≡[o] → ℕ
-  f n = abs (toInt n)
+  f n = abs (toℤ n)
 
   _ : f o≡[o]₁ ≡ 1
   _ = refl

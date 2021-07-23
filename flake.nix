@@ -5,11 +5,13 @@
     nixpkgs.follows = "haskellNix/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
     agda.url = "github:guilhermehas/all-agda";
+    nixpkgs-gui.url = "github:guilhermehas/nixpkgs";
   };
 
-  outputs = { self, nixpkgs, flake-utils, haskellNix, agda }:
+  outputs = { self, nixpkgs, nixpkgs-gui, flake-utils, haskellNix, agda }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
     let
+      pkgs-gui = import nixpkgs-gui { inherit system; };
       overlays = [ agda.overlay ] ++ [ haskellNix.overlay
         (final: prev:
           let src-debug = prev.fetchFromGitHub {
@@ -26,11 +28,11 @@
               src = my-src;
               compiler-nix-name = "ghc8104";
             };
-          agda-cubical = prev.agda-master.withPackages (p: with p; [ cubical ]);
+          agda-all = pkgs-gui.agda.withPackages (p: with p; [ standard-library cubical ]);
           blogProject = with prev; stdenv.mkDerivation {
             name = "guilherme-blog";
             src = my-src;
-            buildInputs = [ final.agda-cubical
+            buildInputs = [ final.agda-all
                             (final.blogToolsProject.getComponent "guilherme-blog:exe:site") ];
 
             buildPhase = ''site build'';
@@ -56,7 +58,7 @@
           haskell-language-server = "latest";
         };
         buildInputs = with pkgs; [
-          agda-cubical
+          agda-all
           (blogToolsProject.getComponent "guilherme-blog:exe:site")
         ];
       };
