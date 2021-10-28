@@ -195,7 +195,6 @@ infixr 2 _⇛⟨_⟩_
 infix  3 _∎₂
 
 data _⇛*_ : Expr → Expr → Set where
-
   _∎₂ : ∀ M
       --------
     → M ⇛* M
@@ -258,3 +257,12 @@ data Progress⇛ (M : Expr) : Set where
       Neutral M
       ----------
     → Progress⇛ M
+
+progress⇛ : ∀ M → Progress⇛ M
+progress⇛ (nat x) = done (nat x)
+progress⇛ (M + N) with progress⇛ M
+... | step st = step (papp st par-refl)
+... | done (nat zero) = step pzero
+... | done (nat (suc x)) with progress⇛ N
+...   | step x = step (papp pnat x)
+...   | done (nat x) = step padd
