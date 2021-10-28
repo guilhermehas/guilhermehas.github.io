@@ -161,11 +161,11 @@ abs-cong : ∀ {M M' N N'}
          → M —↠ M'
          → N —↠ N'
            ----------
-         → M + N —↠ M + N'
+         → M + N —↠ M' + N'
 abs-cong (M ∎) (N ∎) = M + N ∎
 abs-cong (M ∎) (N —→⟨ st ⟩ N') = M + N —→⟨ ξ₂ st ⟩ abs-cong (M ∎) N'
-abs-cong (M —→⟨ st ⟩ M') (N ∎) = M + N ∎
-abs-cong (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ ξ₂ stn ⟩ abs-cong (M ∎) N'
+abs-cong (M —→⟨ st ⟩ M') (N ∎) = M + N —→⟨ ξ₁ st ⟩ abs-cong M' (N ∎)
+abs-cong (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ ξ₁ stm ⟩ abs-cong M' (N —→⟨ stn ⟩ N')
 
 infix 2 _⇛_
 
