@@ -1,3 +1,10 @@
+---
+date: 2021-08-28
+title: Using small step reduction in addition
+author: Guilherme
+---
+
+```
 open import Data.Nat hiding (_+_)
 open import Relation.Binary.PropositionalEquality
 open import Data.Product using (_×_; Σ; Σ-syntax; ∃; ∃-syntax; proj₁; proj₂)
@@ -266,3 +273,4 @@ progress⇛ (M + N) with progress⇛ M
 ... | done (nat (suc x)) with progress⇛ N
 ...   | step x = step (papp pnat x)
 ...   | done (nat x) = step padd
+```
