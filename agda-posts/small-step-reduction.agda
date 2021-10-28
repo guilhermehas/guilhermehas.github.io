@@ -170,7 +170,7 @@ abs-cong (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ ξ�
 infix 2 _⇛_
 
 data _⇛_ : Expr → Expr → Set where
-  pnat : ∀{x}
+  pnat : ∀ {x}
       -----------------
     → nat x ⇛ nat x
 
@@ -180,8 +180,8 @@ data _⇛_ : Expr → Expr → Set where
       ---------------
     → L + M ⇛ L′ + M′
 
-  pzero : ∀ {n}
-    → nat 0 + n ⇛ n
+  pzero : ∀ {N}
+    → nat 0 + N ⇛ N
 
   padd : ∀ {m n}
     → nat (suc m) + nat n ⇛ nat m + nat (suc n)
@@ -248,24 +248,13 @@ par-nat : ∀ {x M}
   → M ≡ nat x
 par-nat pnat = refl
 
-par-triangle : ∀ {M N}
-  → M ⇛ N
-    -------
-  → N ⇛ M ⁺
-par-triangle pnat = pnat
-par-triangle (papp {nat zero} {nat y} pnat pnat) = pzero
-par-triangle (papp {nat (suc x)} {nat y} pnat pnat) = padd
-par-triangle (papp {nat zero} {M = M + N} {nat x} pnat p2) = {!!}
-par-triangle (papp {nat zero} {M = M + N} {M' + M''} pnat p2) = {!!}
-par-triangle (papp {nat (suc x)} {M = M + N} pnat p2) = {!!}
-par-triangle (papp {_ + _} p1 p2) = papp (par-triangle p1) (par-triangle p2)
-par-triangle pzero = par-refl
-par-triangle padd = par-refl
+data Progress⇛ (M : Expr) : Set where
+  step : ∀ {N}
+    → M ⇛ N
+      ----------
+    → Progress⇛ M
 
-strip : ∀ {M N N'}
-  → M ⇛ N
-  → M ⇛* N'
-    ------------------------------------
-  → Σ[ L ∈ Expr ] (N ⇛* L)  ×  (N' ⇛ L)
-strip {M} {N} {.M} mn (M ∎₂) = ⟨ N , ⟨ N ∎₂ , mn ⟩ ⟩
-strip {M} {N} {N′} mn (M ⇛⟨ p ⟩ ps) = {!!}
+  done :
+      Neutral M
+      ----------
+    → Progress⇛ M
