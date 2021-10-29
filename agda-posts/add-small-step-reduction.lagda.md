@@ -30,6 +30,19 @@ data Expr : Set where
   _+_ : Expr → Expr → Expr
 ```
 
+# Values
+
+Value represents its normal form. It is the final answer when the expression is fully evaluated.
+
+```
+data Value : Expr → Set where
+  nat  : ∀ x
+      -------------
+    → Value (nat x)
+```
+
+# Small Step
+
 Now, it will be defined the small step semantic of this programming language:
 
 ```
@@ -39,9 +52,10 @@ data _—→_ : Expr → Expr → Set where
     → m —→ m'
     → m + n —→ m' + n
   ξ₂ : ∀ {m n n'}
+    → Value m
     → n —→ n'
     → m + n —→ m + n'
-  ϕ0 : ∀ {n} → nat 0 + n —→ n
+  ϕ0 : ∀ {n} → nat 0 + nat n —→ nat n
   ϕ+ : ∀ {m n} → nat (suc m) + nat n —→ nat m + nat (suc n)
 
 _ : nat 0 + nat 0 —→ nat 0
@@ -85,17 +99,6 @@ begin_ : ∀ {M N}
 begin M—↠N = M—↠N
 ```
 
-# Values
-
-Value represents its normal form. It is the final answer when the expression is fully evaluated.
-
-```
-data Value : Expr → Set where
-  nat  : ∀ x
-      -------------
-    → Value (nat x)
-```
-
 # Progress
 
 Progress means that the expression is a value or there is a next step to reduce.
@@ -118,12 +121,11 @@ I will show that every expression has this property:
 ```
 progress : ∀ M → Progress M
 progress (nat x) = done (nat x)
-progress (M + N) with progress M
-... | step M—→M' = step (ξ₁ M—→M')
-... | done (nat zero) = step ϕ0
-... | done (nat (suc x)) with progress N
-...   | step N—→N' = step (ξ₂ N—→N')
-...   | done (nat _) = step ϕ+
+progress (M + N) with ⟨ progress M , progress N ⟩
+... | ⟨ step x , snd ⟩ = step (ξ₁ x)
+... | ⟨ done x , step x₁ ⟩ = step (ξ₂ x x₁)
+... | ⟨ done (nat zero) , done (nat y) ⟩ = step ϕ0
+... | ⟨ done (nat (suc x)) , done (nat y) ⟩ = step ϕ+
 
 data Finished (N : Expr) : Set where
    done :
@@ -141,6 +143,20 @@ data Steps : Expr → Set where
     → Finished N
       ----------
     → Steps L
+
+deterministic : ∀ {L M N}
+  → L —→ M
+  → L —→ N
+      ------
+  → M ≡ N
+deterministic ϕ0 ϕ0 = refl
+deterministic ϕ+ ϕ+ = refl
+deterministic (ξ₁ LM) (ξ₁ LN) with deterministic LM LN
+... | refl = refl
+deterministic (ξ₁ ()) (ξ₂ (nat x) LN)
+deterministic (ξ₂ (nat x) LM) (ξ₁ ())
+deterministic (ξ₂ x LM) (ξ₂ x₁ LN) with deterministic LM LN
+... | refl = refl
 
 eval :
     ℕ
@@ -162,11 +178,9 @@ _ : eval 100 (nat 2 + nat 2) ≡ steps
 _ = refl
 
 _ : eval 100 (nat 1 + nat 1 + nat 2) ≡ steps
-  (nat 1 + nat 1 + nat 2 —→⟨ ξ₂ ϕ+ ⟩
-   nat 1 + nat 0 + nat 3 —→⟨ ξ₂ ϕ0 ⟩
-   nat 1 + nat 3         —→⟨ ϕ+    ⟩
-   nat 0 + nat 4         —→⟨ ϕ0    ⟩
-   nat 4 ∎)
+    (nat 1 + nat 1 + nat 2 —→⟨ ξ₂ (nat 1) ϕ+ ⟩
+       nat 1 + nat zero + nat 3 —→⟨ ξ₂ (nat 1) ϕ0 ⟩
+       nat 1 + nat 3 —→⟨ ϕ+ ⟩ nat zero + nat 4 —→⟨ ϕ0 ⟩ nat 4 ∎)
    (done (nat 4))
 _ = refl
 
@@ -204,21 +218,23 @@ appL-cong {L}{L'}{M} (L ∎) = L + M ∎
 appL-cong {L}{L'}{M} (L —→⟨ r ⟩ rs) = L + M —→⟨ ξ₁ r ⟩ appL-cong rs
 
 appR-cong : ∀ {L M M'}
+         → Value L
          → M —↠ M'
            ---------------
          → L + M —↠ L + M'
-appR-cong {L}{M}{M'} (M ∎) = L + M ∎
-appR-cong {L}{M}{M'} (M —→⟨ r ⟩ rs) = L + M —→⟨ ξ₂ r ⟩ appR-cong rs
+appR-cong {L}{M}{M'} VL (M ∎) = L + M ∎
+appR-cong {L}{M}{M'} VL (M —→⟨ r ⟩ rs) = L + M —→⟨ ξ₂ VL r ⟩ appR-cong VL rs
 
 abs-cong : ∀ {M M' N N'}
+         → Value M'
          → M —↠ M'
          → N —↠ N'
            ----------
          → M + N —↠ M' + N'
-abs-cong (M ∎) (N ∎) = M + N ∎
-abs-cong (M ∎) (N —→⟨ st ⟩ N') = M + N —→⟨ ξ₂ st ⟩ abs-cong (M ∎) N'
-abs-cong (M —→⟨ st ⟩ M') (N ∎) = M + N —→⟨ ξ₁ st ⟩ abs-cong M' (N ∎)
-abs-cong (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ ξ₁ stm ⟩ abs-cong M' (N —→⟨ stn ⟩ N')
+abs-cong VM (M ∎) (N ∎) = M + N ∎
+abs-cong VM (M ∎) (N —→⟨ st ⟩ N') = M + N —→⟨ ξ₂ VM st ⟩ abs-cong VM (M ∎) N'
+abs-cong VM (M —→⟨ st ⟩ M') (N ∎) = M + N —→⟨ ξ₁ st ⟩ abs-cong VM M' (N ∎)
+abs-cong VM (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ ξ₁ stm ⟩ abs-cong VM M' (N —→⟨ stn ⟩ N')
 
 infix 2 _⇛_
 
@@ -265,35 +281,7 @@ beta-par : ∀ {M N}
 beta-par ϕ0 = pzero
 beta-par ϕ+ = padd
 beta-par (ξ₁ st) = papp (beta-par st) par-refl
-beta-par (ξ₂ st) = papp par-refl (beta-par st)
-
-par-betas : ∀ {M N}
-  → M ⇛ N
-    ------
-  → M —↠ N
-par-betas pnat = nat _ ∎
-par-betas pzero = nat zero + _ —→⟨ ϕ0 ⟩ _ ∎
-par-betas padd = nat (suc _) + nat _ —→⟨ ϕ+ ⟩ nat _ + nat (suc _) ∎
-par-betas (papp {M} {M'} {N} {N'} p₁ p₂) =
-  begin
-  M  + N  —↠⟨ appL-cong (par-betas p₁) ⟩
-  M' + N  —↠⟨ appR-cong (par-betas p₂) ⟩
-  M' + N' ∎
-
-pars-betas : ∀ {M N}
-  → M ⇛* N
-    ------
-  → M —↠ N
-pars-betas (M ∎₂) = M ∎
-pars-betas (L ⇛⟨ p ⟩ ps) = —↠-trans (par-betas p) (pars-betas ps)
-
-infix 25 _⁺
-_⁺ : Expr → Expr
-nat x ⁺ = nat x
-(nat zero + s₂) ⁺ = s₂
-(nat (suc x) + nat y) ⁺ = nat x + nat (suc y)
-(s₁@(nat (suc x)) + s₂@(s₃ + s₄)) ⁺ = s₁ ⁺  +  s₂ ⁺
-(s₁@(s₃ + s₄) + s₂) ⁺ = s₁ ⁺  +  s₂ ⁺
+beta-par (ξ₂ vl st) = papp par-refl (beta-par st)
 
 par-nat : ∀ {x M}
   → nat x ⇛ M
@@ -316,7 +304,7 @@ progress⇛ (nat x) = done (nat x)
 progress⇛ (M + N) with progress⇛ M
 ... | step st = step (papp st par-refl)
 ... | done (nat zero) = step pzero
-... | done (nat (suc x)) with progress⇛ N
-...   | step x = step (papp pnat x)
-...   | done (nat x) = step padd
+... | done (nat (suc _)) with progress⇛ N
+...   | step st = step (papp pnat st)
+...   | done (nat _) = step padd
 ```
