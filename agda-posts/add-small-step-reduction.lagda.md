@@ -4,17 +4,35 @@ title: Using small step reduction in addition
 author: Guilherme
 ---
 
+# Motivation
+
+The objective of this project is to do a minimalistic example of small step semantics using
+the concepts of the book [Programming Language Foundations in Agda](https://plfa.github.io/).
+
+# Imports
+
+Importing from [Agda standard library](https://github.com/agda/agda-stdlib).
+
 ```
 open import Data.Nat hiding (_+_)
 open import Relation.Binary.PropositionalEquality
-open import Data.Product using (_×_; Σ; Σ-syntax; ∃; ∃-syntax; proj₁; proj₂)
-  renaming (_,_ to ⟨_,_⟩)
+open import Data.Product renaming (_,_ to ⟨_,_⟩)
+```
 
+# Defining the language
+
+The language is a simple expression that can be a natural number or a sum of two expressions.
+
+```
 infixr 6 _+_
 data Expr : Set where
   nat : ℕ → Expr
   _+_ : Expr → Expr → Expr
+```
 
+Now, it will be defined the small step semantic of this programming language:
+
+```
 infixr 2 _—→_
 data _—→_ : Expr → Expr → Set where
   ξ₁ : ∀ {m m' n}
@@ -28,7 +46,21 @@ data _—→_ : Expr → Expr → Set where
 
 _ : nat 0 + nat 0 —→ nat 0
 _ = ϕ0
+```
 
+The first two steps are reduction of some part of the addition.
+`ϕ0` is related to the reduction when the left part is zero.
+`ϕ+` is the reduction when the left part is the successor of a natural number.
+ The definitions of `ϕ0` and `ϕ+` look like the induction definition of addition.
+ While `ξ₁` and `ξ₂` are extra steps.
+
+# Multi step
+
+Now, it will be defined the multi step of the language.
+It can be a zero step, so an expression `M` can go to `M` (`M —↠ M`)
+or a multiple step (that can be one, two or any natural number).
+
+```
 infix  2 _—↠_
 infix  1 begin_
 infixr 2 _—→⟨_⟩_
@@ -51,14 +83,24 @@ begin_ : ∀ {M N}
     ------
   → M —↠ N
 begin M—↠N = M—↠N
+```
 
-data Neutral : Expr → Set
+# Values
 
-data Neutral where
+Value represents its normal form. It is the final answer when the expression is fully evaluated.
+
+```
+data Value : Expr → Set where
   nat  : ∀ x
       -------------
-    → Neutral (nat x)
+    → Value (nat x)
+```
 
+# Progress
+
+Progress means that the expression is a value or there is a next step to reduce.
+
+```
 data Progress (M : Expr) : Set where
   step : ∀ {N}
     → M —→ N
@@ -66,10 +108,14 @@ data Progress (M : Expr) : Set where
     → Progress M
 
   done :
-      Neutral M
+      Value M
       ----------
     → Progress M
+```
 
+I will show that every expression has this property:
+
+```
 progress : ∀ M → Progress M
 progress (nat x) = done (nat x)
 progress (M + N) with progress M
@@ -81,7 +127,7 @@ progress (M + N) with progress M
 
 data Finished (N : Expr) : Set where
    done :
-       Neutral N
+       Value N
        ----------
      → Finished N
 
@@ -261,7 +307,7 @@ data Progress⇛ (M : Expr) : Set where
     → Progress⇛ M
 
   done :
-      Neutral M
+      Value M
       ----------
     → Progress⇛ M
 
