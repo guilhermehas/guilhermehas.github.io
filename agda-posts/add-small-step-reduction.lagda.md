@@ -30,7 +30,7 @@ data Expr : Set where
   _+_ : Expr → Expr → Expr
 ```
 
-# Values
+## Values
 
 Value represents its normal form. It is the final answer when the expression is fully evaluated.
 
@@ -118,11 +118,11 @@ progress (M + N) with ⟨ progress M , progress N ⟩
 ... | ⟨ done (nat (suc x)) , done (nat y) ⟩ = step ϕ+
 ```
 
-# Multi step
+## Multi step
 
 Now, it will be defined the multi step of the language.
 It can be a zero step, so an expression `M` can go to `M` (`M —↠ M`)
-or a multiple step (that can be one, two or any natural number).
+or it can be a multiple step (that can be one, two or any natural number).
 
 ```
 infix  2 _—↠_
@@ -149,7 +149,7 @@ begin_ : ∀ {M N}
 begin M—↠N = M—↠N
 ```
 
-# Evaluation
+## Evaluation
 
 For the definition evaluation, it will be necessary to defined when an
 expression was finished in the evaluation and the steps of the evaluation.
@@ -168,8 +168,8 @@ data Finished (N : Expr) : Set where
 
 A expression is finished when it is a value or when there is no more gas
 available to calculate it.
-In Agda, every computation must terminate. So it is impossible to have
-an infinite loop. So when an expression takes so much time or computation
+In Agda, every computation must terminates. So it is impossible to have
+an infinite loop. So when an expression takes so much time
 to finish, it runs out of gas and there is no result.
 
 ```
@@ -197,8 +197,8 @@ eval (suc n) L with progress L
 ...   | steps M—→N fin = steps (L —→⟨ L—→M ⟩ M—→N) fin
 ```
 
-The evaluation takes gas as first param and the expression to evaluate.
-In the end, it returns the value with a proof that the expression evaluate
+The evaluation takes gas and the expression to evaluate.
+In the end, it returns the value with a proof that the expression evaluates
 to this value.
 
 Here, some examples of the evaluation:
@@ -230,9 +230,9 @@ _ : eval 100 ((nat 1 + nat 1) + nat 2) ≡ steps
 _ = refl
 ```
 
-# Proofs for later use
+## Proofs for later use
 
-I prove some axioms to use it later in the part of parallel reduction.
+I will prove some axioms to use it later in the part of parallel reduction:
 
 ```
 —↠-trans : ∀ {L M N}
@@ -285,7 +285,7 @@ so it can run faster in a multi core computer.
 
 ## Single step
 
-Here, the definition of single step reduction of the parallel reduction.
+Here, the definition of single step of the parallel reduction.
 
 ```
 infix 2 _⇛_
@@ -309,7 +309,7 @@ data _⇛_ : Expr → Expr → Set where
 ```
 
 The biggest difference of this reduction is `papp`, that
-do two reductions at the same time.
+does two reductions at the same time.
 It can run faster in a multi core computer.
 
 ## Multi step
@@ -349,7 +349,7 @@ beta-par : ∀ {M N}
 beta-par ϕ0 = pzero
 beta-par ϕ+ = padd
 beta-par (ξ₁ st) = papp (beta-par st) par-refl
-beta-par (ξ₂ vl st) = papp par-refl (beta-par st)
+beta-par (ξ₂ _ st) = papp par-refl (beta-par st)
 
 par-nat : ∀ {x M}
   → nat x ⇛ M
@@ -361,7 +361,7 @@ par-nat pnat = refl
 
 I will define progress in the same way that I defined previouly.
 It will be used to prove that an expression is already a value
-or there will be a step to reduce.
+or there is a step to reduce.
 
 ```
 data Progress⇛ (M : Expr) : Set where
