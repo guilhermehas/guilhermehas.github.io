@@ -18,7 +18,7 @@ jobs:
        - name: Build
          run:  nix build -v --print-build-logs
 
-name: Build
+name: Deploy
 on:
   push:
     branches:
