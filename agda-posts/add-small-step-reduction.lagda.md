@@ -21,7 +21,7 @@ open import Data.Product renaming (_,_ to ⟨_,_⟩)
 
 # Defining the language
 
-The language is a simple expression that can be a natural number or a sum of two expressions.
+The programming language is a simple expression that can be a natural number or a sum of two expressions.
 
 ```
 infixr 6 _+_
@@ -32,7 +32,7 @@ data Expr : Set where
 
 ## Values
 
-Value represents its normal form. It is the final answer when the expression is fully evaluated.
+Values represent their normal form. It is the final answer when the expression is fully evaluated.
 
 ```
 data Value : Expr → Set where
@@ -120,9 +120,9 @@ progress (M + N) with ⟨ progress M , progress N ⟩
 
 ## Multi step
 
-Now, it will be defined the multi step of the language.
-It can be a zero step, so an expression `M` can go to `M` (`M —↠ M`)
-or it can be a multiple step (that can be one, two or any natural number).
+Now, it will be defined the multi-step of the language.
+It can be a zero-step, so an expression `M` can go to `M` (`M —↠ M`)
+or it can be multiple steps (that can be one, two, or any natural number).
 
 ```
 infix  2 _—↠_
@@ -151,7 +151,7 @@ begin M—↠N = M—↠N
 
 ## Evaluation
 
-For the definition evaluation, it will be necessary to defined when an
+For the definition evaluation, it will necessary to be defined when an
 expression was finished in the evaluation and the steps of the evaluation.
 
 ```
@@ -166,9 +166,9 @@ data Finished (N : Expr) : Set where
        Finished N
 ```
 
-A expression is finished when it is a value or when there is no more gas
+An expression is finished when it is a value or when there is no more gas
 available to calculate it.
-In Agda, every computation must terminates. So it is impossible to have
+In Agda, every computation must terminate. So it is impossible to have
 an infinite loop. So when an expression takes so much time
 to finish, it runs out of gas and there is no result.
 
@@ -181,7 +181,7 @@ data Steps : Expr → Set where
     → Steps L
 ```
 
-The evaluation finishes when there is a proof of multi step for the value
+The evaluation finishes when there is proof of multi-step for the value
 and it is already finished.
 
 ```
@@ -198,8 +198,8 @@ eval (suc n) L with progress L
 ```
 
 The evaluation takes gas and the expression to evaluate.
-In the end, it returns the value with a proof that the expression evaluates
-to this value.
+In the end, it returns the value with proof that the expression evaluates
+this value.
 
 Here, some examples of the evaluation:
 
@@ -281,11 +281,11 @@ abs-cong VM (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ 
 # Parallel Reduction
 
 The parallel reduction is good for doing reductions in parallel,
-so it can run faster in a multi core computer.
+so it can run faster in a multi-core computer.
 
 ## Single step
 
-Here, the definition of single step of the parallel reduction.
+Here, the definition of a single step of the parallel reduction.
 
 ```
 infix 2 _⇛_
@@ -310,7 +310,7 @@ data _⇛_ : Expr → Expr → Set where
 
 The biggest difference of this reduction is `papp`, that
 does two reductions at the same time.
-It can run faster in a multi core computer.
+It can run faster on a multi-core computer.
 
 ## Multi step
 
@@ -333,7 +333,7 @@ data _⇛*_ : Expr → Expr → Set where
     → L ⇛* N
 ```
 
-## Theorems for latter use
+## Theorems for later use
 
 Some theorems to use latter:
 
@@ -359,7 +359,7 @@ par-nat pnat = refl
 
 ## Progress
 
-I will define progress in the same way that I defined previouly.
+I will define progress in the same way that I defined previously.
 It will be used to prove that an expression is already a value
 or there is a step to reduce.
 
