@@ -1,5 +1,5 @@
 ---
-date: 2021-08-28
+date: 2021-08-30
 title: Using small step reduction in addition
 author: Guilherme
 ---
