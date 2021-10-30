@@ -68,6 +68,56 @@ The first two steps are reduction of some part of the addition.
  The definitions of `ϕ0` and `ϕ+` look like the induction definition of addition.
  While `ξ₁` and `ξ₂` are extra steps.
 
+## Deterministic
+
+With determinism, it is only possible to have one step of reduction.
+If there are two, both reduce to the same expression.
+
+```
+deterministic : ∀ {L M N}
+  → L —→ M
+  → L —→ N
+      ------
+  → M ≡ N
+deterministic ϕ0 ϕ0 = refl
+deterministic ϕ+ ϕ+ = refl
+deterministic (ξ₁ LM) (ξ₁ LN) with deterministic LM LN
+... | refl = refl
+deterministic (ξ₁ ()) (ξ₂ (nat x) LN)
+deterministic (ξ₂ (nat x) LM) (ξ₁ ())
+deterministic (ξ₂ x LM) (ξ₂ x₁ LN) with deterministic LM LN
+... | refl = refl
+```
+
+## Progress
+
+Progress means that the expression is a value or there is a next step to reduce.
+
+```
+data Progress (M : Expr) : Set where
+  step : ∀ {N}
+    → M —→ N
+      ----------
+    → Progress M
+
+  done :
+      Value M
+      ----------
+    → Progress M
+```
+
+I will show that every expression has this property:
+
+```
+progress : ∀ M → Progress M
+progress (nat x) = done (nat x)
+progress (M + N) with ⟨ progress M , progress N ⟩
+... | ⟨ step x , snd ⟩ = step (ξ₁ x)
+... | ⟨ done x , step x₁ ⟩ = step (ξ₂ x x₁)
+... | ⟨ done (nat zero) , done (nat y) ⟩ = step ϕ0
+... | ⟨ done (nat (suc x)) , done (nat y) ⟩ = step ϕ+
+```
+
 # Multi step
 
 Now, it will be defined the multi step of the language.
@@ -99,34 +149,12 @@ begin_ : ∀ {M N}
 begin M—↠N = M—↠N
 ```
 
-# Progress
+# Evaluation
 
-Progress means that the expression is a value or there is a next step to reduce.
-
-```
-data Progress (M : Expr) : Set where
-  step : ∀ {N}
-    → M —→ N
-      ----------
-    → Progress M
-
-  done :
-      Value M
-      ----------
-    → Progress M
-```
-
-I will show that every expression has this property:
+For the definition evaluation, it will be necessary to defined when an
+expression was finished in the evaluation and the steps of the evaluation.
 
 ```
-progress : ∀ M → Progress M
-progress (nat x) = done (nat x)
-progress (M + N) with ⟨ progress M , progress N ⟩
-... | ⟨ step x , snd ⟩ = step (ξ₁ x)
-... | ⟨ done x , step x₁ ⟩ = step (ξ₂ x x₁)
-... | ⟨ done (nat zero) , done (nat y) ⟩ = step ϕ0
-... | ⟨ done (nat (suc x)) , done (nat y) ⟩ = step ϕ+
-
 data Finished (N : Expr) : Set where
    done :
        Value N
@@ -136,28 +164,27 @@ data Finished (N : Expr) : Set where
    out-of-gas :
        ----------
        Finished N
+```
 
+A expression is finished when it is a value or when there is no more gas
+available to calculate it.
+In Agda, every computation must terminate. So it is impossible to have
+an infinite loop. So when an expression takes so much time or computation
+to finish, it runs out of gas and there is no result.
+
+```
 data Steps : Expr → Set where
   steps : ∀ {L N}
     → L —↠ N
     → Finished N
       ----------
     → Steps L
+```
 
-deterministic : ∀ {L M N}
-  → L —→ M
-  → L —→ N
-      ------
-  → M ≡ N
-deterministic ϕ0 ϕ0 = refl
-deterministic ϕ+ ϕ+ = refl
-deterministic (ξ₁ LM) (ξ₁ LN) with deterministic LM LN
-... | refl = refl
-deterministic (ξ₁ ()) (ξ₂ (nat x) LN)
-deterministic (ξ₂ (nat x) LM) (ξ₁ ())
-deterministic (ξ₂ x LM) (ξ₂ x₁ LN) with deterministic LM LN
-... | refl = refl
+The evaluation finishes when there is a proof of multi step for the value
+and it is already finished.
 
+```
 eval :
     ℕ
   → (L : Expr)
@@ -168,7 +195,15 @@ eval (suc n) L with progress L
 ... | done x = steps (L ∎) (done x)
 ... | step {M} L—→M with eval n M
 ...   | steps M—→N fin = steps (L —→⟨ L—→M ⟩ M—→N) fin
+```
 
+The evaluation takes gas as first param and the expression to evaluate.
+In the end, it returns the value with a proof that the expression evaluate
+to this value.
+
+Here, some examples of the evaluation:
+
+```
 _ : eval 100 (nat 2 + nat 2) ≡ steps
   (nat 2 + nat 2 —→⟨ ϕ+ ⟩
    nat 1 + nat 3 —→⟨ ϕ+ ⟩
@@ -193,7 +228,13 @@ _ : eval 100 ((nat 1 + nat 1) + nat 2) ≡ steps
     nat 4 ∎)
   (done (nat 4))
 _ = refl
+```
 
+# Proofs for later use
+
+I prove some axioms to use it later in the part of parallel reduction.
+
+```
 —↠-trans : ∀ {L M N}
          → L —↠ M
          → M —↠ N
@@ -235,7 +276,18 @@ abs-cong VM (M ∎) (N ∎) = M + N ∎
 abs-cong VM (M ∎) (N —→⟨ st ⟩ N') = M + N —→⟨ ξ₂ VM st ⟩ abs-cong VM (M ∎) N'
 abs-cong VM (M —→⟨ st ⟩ M') (N ∎) = M + N —→⟨ ξ₁ st ⟩ abs-cong VM M' (N ∎)
 abs-cong VM (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ ξ₁ stm ⟩ abs-cong VM M' (N —→⟨ stn ⟩ N')
+```
 
+# Parallel Reduction
+
+The parallel reduction is good for doing reductions in parallel,
+so it can run faster in a multi core computer.
+
+## Single step
+
+Here, the definition of single step reduction of the parallel reduction.
+
+```
 infix 2 _⇛_
 
 data _⇛_ : Expr → Expr → Set where
@@ -254,11 +306,17 @@ data _⇛_ : Expr → Expr → Set where
 
   padd : ∀ {m n}
     → nat (suc m) + nat n ⇛ nat m + nat (suc n)
+```
 
-par-refl : ∀ {M} → M ⇛ M
-par-refl {nat x} = pnat
-par-refl {M + N} = papp par-refl par-refl
+The biggest difference of this reduction is `papp`, that
+do two reductions at the same time.
+It can run faster in a multi core computer.
 
+## Multi step
+
+The sequences of parallel reduction will be defined in this way:
+
+```
 infix  2 _⇛*_
 infixr 2 _⇛⟨_⟩_
 infix  3 _∎₂
@@ -273,6 +331,16 @@ data _⇛*_ : Expr → Expr → Set where
     → M ⇛* N
       ---------
     → L ⇛* N
+```
+
+## Theorems for latter use
+
+Some theorems to use latter:
+
+```
+par-refl : ∀ {M} → M ⇛ M
+par-refl {nat _} = pnat
+par-refl {_ + _} = papp par-refl par-refl
 
 beta-par : ∀ {M N}
   → M —→ N
@@ -287,7 +355,15 @@ par-nat : ∀ {x M}
   → nat x ⇛ M
   → M ≡ nat x
 par-nat pnat = refl
+```
 
+## Progress
+
+I will define progress in the same way that I defined previouly.
+It will be used to prove that an expression is already a value
+or there will be a step to reduce.
+
+```
 data Progress⇛ (M : Expr) : Set where
   step : ∀ {N}
     → M ⇛ N
