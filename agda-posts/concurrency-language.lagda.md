@@ -145,15 +145,26 @@ eval (suc gas) sxs L with eval-step sxs L
 ...   | out-of-gas = out-of-gas
 ...   | done (steps xs st2) = done (steps (n ∷ xs) (L —→⟨ st ⟩ st2))
 
-_ : eval 100 (repeat false) ||prog ≡ done
+rfalse = repeat false
+rtrue = repeat true
+evalf = eval 100 rfalse
+evalt = eval 100 rtrue
+
+_ : evalf ||prog ≡ done
   (steps (0 ∷ [ 1 ])
   (nat 0 || nat 1 —→⟨ ξ||∅ₗ ξℕ ⟩
   (nat 1 —→⟨⟩ ξℕ)))
 _ = refl
 
-_ : eval 100 (repeat true) ||prog ≡ done
+_ : evalt ||prog ≡ done
   (steps (1 ∷ [ 0 ])
   (nat 0 || nat 1 —→⟨ ξ||∅ᵣ ξℕ ⟩
   (nat 0 —→⟨⟩ ξℕ)))
+_ = refl
+
+_ : evalf (nat 0 ,, nat 1) ≡ done
+  (steps (0 ∷ [ 1 ])
+  (nat 0 ,, nat 1 —→⟨ ξ,,∅ ξℕ ⟩
+  (nat 1 —→⟨⟩ ξℕ)))
 _ = refl
 ```
