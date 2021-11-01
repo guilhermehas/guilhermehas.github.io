@@ -15,7 +15,7 @@ open import Data.List
 open import Data.Maybe
 open import Codata.Thunk
 import Codata.Stream as Stream
-open Stream using (Stream; _∷_)
+open Stream using (Stream; _∷_; repeat)
 
 infixr 6 _||_
 infixr 7 _,,_
@@ -24,8 +24,10 @@ data Expr : Set where
   _||_ : Expr → Expr → Expr
   _,,_ : Expr → Expr → Expr
 
+NextExpr = ℕ × Maybe Expr
+
 infixr 2 _—→_
-data _—→_ : Expr → ℕ × Maybe Expr → Set where
+data _—→_ : Expr → NextExpr → Set where
   ξℕ : ∀ {n}
     → nat n —→ n , nothing
   ξ||ₗ : ∀ {M M' N n}
@@ -106,19 +108,52 @@ data Steps : Expr → Set where
       ----------
     → Steps L
 
--- eval :
---   Stream Bool _
---   → (L : Expr)
---   → Stream Bool _ × Steps L
--- eval sb (nat x) = sb , steps (x ∷ []) (nat x —→⟨⟩ ξℕ)
--- eval sb (M ,, N) with eval sb M
--- ... | sb2 , steps xs st with eval sb2 N
--- ...   | sb3 , steps ys st2 = sb3 , steps (xs ++ ys) (,,-sequence st st2)
--- eval (false ∷ stxs) (nat y || N) with eval (stxs .force) N
--- ... | stys , steps ys st = stys , steps (y ∷ ys) (nat y || N —→⟨ ξ||∅ₗ ξℕ ⟩ st)
--- eval (true ∷ stxs)  (nat y || N) with eval (stxs . force) N
--- ... | stys , steps ys st = stys , (steps {!!} {!!})
--- eval (x ∷ xs)     ((L || M) || N)  = {!!}
--- eval (x ∷ xs)     (L ,, M || N)    = {!!}
+data Finished (N : Expr) : Set where
+   done :
+       Steps N
+       ----------
+     → Finished N
 
+   out-of-gas :
+       ----------
+       Finished N
+
+eval-step :
+  Stream Bool _
+  → (L : Expr)
+  → Stream Bool _ × SingleStep L
+eval-step sxs (nat x) = sxs , (singleStep x nothing ξℕ)
+eval-step sxs (M ,, N) with eval-step sxs M
+... | sys , singleStep n (just M') st = sys , (singleStep n (just (M' ,, N)) (ξ,, st))
+... | sys , singleStep n nothing st = sys , (singleStep n (just N) (ξ,,∅ st))
+eval-step (false ∷ sxs) (M || N) with eval-step (sxs .force) M
+... | sys , singleStep n (just M') st = sys , (singleStep n (just (M' || N) ) (ξ||ₗ st))
+... | sys , singleStep n nothing st = sys , (singleStep n (just N) (ξ||∅ₗ st))
+eval-step (true ∷ sxs) (M || N) with eval-step (sxs .force) N
+... | sys , singleStep n (just N') st = sys , (singleStep n (just (M || N') ) (ξ||ᵣ st))
+... | sys , singleStep n nothing st = sys , (singleStep n (just M) (ξ||∅ᵣ st))
+
+eval :
+  ℕ
+  → Stream Bool _
+  → (L : Expr)
+  → Finished L
+eval 0 sxs L = out-of-gas
+eval (suc gas) sxs L with eval-step sxs L
+... | sys , singleStep n nothing st = done (steps [ n ] (L —→⟨⟩ st))
+... | sys , singleStep n (just M) st with eval gas sys M
+...   | out-of-gas = out-of-gas
+...   | done (steps xs st2) = done (steps (n ∷ xs) (L —→⟨ st ⟩ st2))
+
+_ : eval 100 (repeat false) ||prog ≡ done
+  (steps (0 ∷ [ 1 ])
+  (nat 0 || nat 1 —→⟨ ξ||∅ₗ ξℕ ⟩
+  (nat 1 —→⟨⟩ ξℕ)))
+_ = refl
+
+_ : eval 100 (repeat true) ||prog ≡ done
+  (steps (1 ∷ [ 0 ])
+  (nat 0 || nat 1 —→⟨ ξ||∅ᵣ ξℕ ⟩
+  (nat 0 —→⟨⟩ ξℕ)))
+_ = refl
 ```
