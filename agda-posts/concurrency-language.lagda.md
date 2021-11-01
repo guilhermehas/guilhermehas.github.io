@@ -18,11 +18,11 @@ import Codata.Stream as Stream
 open Stream using (Stream; _∷_)
 
 infixr 6 _||_
-infixr 7 _!!_
+infixr 7 _,,_
 data Expr : Set where
   nat : ℕ → Expr
   _||_ : Expr → Expr → Expr
-  _!!_ : Expr → Expr → Expr
+  _,,_ : Expr → Expr → Expr
 
 infixr 2 _—→_
 data _—→_ : Expr → ℕ × Maybe Expr → Set where
@@ -40,12 +40,12 @@ data _—→_ : Expr → ℕ × Maybe Expr → Set where
   ξ||∅ᵣ : ∀ {M N n}
     → N —→ n , nothing
     → M || N —→ n , just M
-  ξ!! : ∀ {M M' N n}
+  ξ,, : ∀ {M M' N n}
     → M —→ n , just M'
-    → M !! N —→ n , just (M' !! N)
-  ξ!!∅ : ∀ {M N n}
+    → M ,, N —→ n , just (M' ,, N)
+  ξ,,∅ : ∀ {M N n}
     → M —→ n , nothing
-    → M !! N —→ n , just N
+    → M ,, N —→ n , just N
 
 ||prog = nat 0 || nat 1
 
@@ -87,12 +87,12 @@ infix 2 _—⇀_
 _—⇀_ : Expr → List ℕ → Set
 L —⇀ xs = L —↠ xs , nothing
 
-!!-sequence : ∀ {M N xs ys}
+,,-sequence : ∀ {M N xs ys}
   → M —⇀ xs
   → N —⇀ ys
-  → M !! N —⇀ xs ++ ys
-!!-sequence (_ —→⟨⟩ st1) st2 = _ !! _ —→⟨ ξ!!∅ st1 ⟩ st2
-!!-sequence (_ —→⟨ st ⟩ st1) st2 = _ !! _ —→⟨ ξ!! st ⟩ !!-sequence st1 st2
+  → M ,, N —⇀ xs ++ ys
+,,-sequence (_ —→⟨⟩ st1) st2 = _ ,, _ —→⟨ ξ,,∅ st1 ⟩ st2
+,,-sequence (_ —→⟨ st ⟩ st1) st2 = _ ,, _ —→⟨ ξ,, st ⟩ ,,-sequence st1 st2
 
 data SingleStep : Expr → Set where
   singleStep : ∀ {L} n L'
@@ -111,14 +111,14 @@ data Steps : Expr → Set where
 --   → (L : Expr)
 --   → Stream Bool _ × Steps L
 -- eval sb (nat x) = sb , steps (x ∷ []) (nat x —→⟨⟩ ξℕ)
--- eval sb (M !! N) with eval sb M
+-- eval sb (M ,, N) with eval sb M
 -- ... | sb2 , steps xs st with eval sb2 N
--- ...   | sb3 , steps ys st2 = sb3 , steps (xs ++ ys) (!!-sequence st st2)
+-- ...   | sb3 , steps ys st2 = sb3 , steps (xs ++ ys) (,,-sequence st st2)
 -- eval (false ∷ stxs) (nat y || N) with eval (stxs .force) N
 -- ... | stys , steps ys st = stys , steps (y ∷ ys) (nat y || N —→⟨ ξ||∅ₗ ξℕ ⟩ st)
 -- eval (true ∷ stxs)  (nat y || N) with eval (stxs . force) N
 -- ... | stys , steps ys st = stys , (steps {!!} {!!})
 -- eval (x ∷ xs)     ((L || M) || N)  = {!!}
--- eval (x ∷ xs)     (L !! M || N)    = {!!}
+-- eval (x ∷ xs)     (L ,, M || N)    = {!!}
 
 ```
