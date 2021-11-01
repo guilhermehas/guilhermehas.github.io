@@ -275,7 +275,8 @@ abs-cong : ∀ {M M' N N'}
 abs-cong VM (M ∎) (N ∎) = M + N ∎
 abs-cong VM (M ∎) (N —→⟨ st ⟩ N') = M + N —→⟨ ξ₂ VM st ⟩ abs-cong VM (M ∎) N'
 abs-cong VM (M —→⟨ st ⟩ M') (N ∎) = M + N —→⟨ ξ₁ st ⟩ abs-cong VM M' (N ∎)
-abs-cong VM (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ ξ₁ stm ⟩ abs-cong VM M' (N —→⟨ stn ⟩ N')
+abs-cong VM (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') =
+  M + N —→⟨ ξ₁ stm ⟩ abs-cong VM M' (N —→⟨ stn ⟩ N')
 ```
 
 # Parallel Reduction
