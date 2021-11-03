@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta http-equiv="x-ua-compatible" content="ie=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Guilherme Silva Blog - Using small step reduction in addition</title>
+        <title>Guilherme Silva Blog - Using small-step reduction in addition</title>
         <link rel="stylesheet" href="../css/default.css" />
         <link rel="stylesheet" href="Agda.css" />
     </head>
@@ -20,7 +20,7 @@
         </header>
 
         <main role="main">
-            <h1>Using small step reduction in addition</h1>
+            <h1>Using small-step reduction in addition</h1>
             <article>
     <section class="header">
         Posted on August 30, 2021
@@ -30,7 +30,7 @@
     </section>
     <section>
         <h1 id="motivation">Motivation</h1>
-<p>The objective of this project is to do a minimalistic example of small step semantics using the concepts of the book <a href="https://plfa.github.io/">Programming Language Foundations in Agda</a>.</p>
+<p>The objective of this project is to do a minimalistic example of small-step semantics using the concepts of the book <a href="https://plfa.github.io/">Programming Language Foundations in Agda</a>.</p>
 <h1 id="imports">Imports</h1>
 <p>Importing from <a href="https://github.com/agda/agda-stdlib">Agda standard library</a>.</p>
 <pre class="Agda"><a id="385" class="Keyword">open</a> <a id="390" class="Keyword">import</a> <a id="397" href="Data.Nat.html" class="Module">Data.Nat</a> <a id="406" class="Keyword">hiding</a> <a id="413" class="Symbol">(</a><a id="414" href="Agda.Builtin.Nat.html#325" class="Primitive Operator">_+_</a><a id="417" class="Symbol">)</a>
@@ -51,8 +51,8 @@
       <a id="907" class="Comment">-------------</a>
     <a id="925" class="Symbol">→</a> <a id="927" href="small-step-reduction.html#863" class="Datatype">Value</a> <a id="933" class="Symbol">(</a><a id="934" href="small-step-reduction.html#696" class="InductiveConstructor">nat</a> <a id="938" href="small-step-reduction.html#899" class="Bound">x</a><a id="939" class="Symbol">)</a>
 </pre>
-<h1 id="small-step">Small Step</h1>
-<p>Now, it will be defined the small step semantic of this programming language:</p>
+<h1 id="small-step">Small-Step</h1>
+<p>Now, it will be defined the small-step semantic of this programming language:</p>
 <pre class="Agda"><a id="1043" class="Keyword">infixr</a> <a id="1050" class="Number">2</a> <a id="1052" href="small-step-reduction.html#1062" class="Datatype Operator">_—→_</a>
 <a id="1057" class="Keyword">data</a> <a id="_—→_"></a><a id="1062" href="small-step-reduction.html#1062" class="Datatype Operator">_—→_</a> <a id="1067" class="Symbol">:</a> <a id="1069" href="small-step-reduction.html#677" class="Datatype">Expr</a> <a id="1074" class="Symbol">→</a> <a id="1076" href="small-step-reduction.html#677" class="Datatype">Expr</a> <a id="1081" class="Symbol">→</a> <a id="1083" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="1087" class="Keyword">where</a>
   <a id="_—→_.ξ₁"></a><a id="1095" href="small-step-reduction.html#1095" class="InductiveConstructor">ξ₁</a> <a id="1098" class="Symbol">:</a> <a id="1100" class="Symbol">∀</a> <a id="1102" class="Symbol">{</a><a id="1103" href="small-step-reduction.html#1103" class="Bound">m</a> <a id="1105" href="small-step-reduction.html#1105" class="Bound">m'</a> <a id="1108" href="small-step-reduction.html#1108" class="Bound">n</a><a id="1109" class="Symbol">}</a>
