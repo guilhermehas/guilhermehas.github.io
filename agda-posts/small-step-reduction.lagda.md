@@ -1,12 +1,12 @@
 ---
 date: 2021-08-30
-title: Using small step reduction in addition
+title: Using small-step reduction in addition
 author: Guilherme
 ---
 
 # Motivation
 
-The objective of this project is to do a minimalistic example of small step semantics using
+The objective of this project is to do a minimalistic example of small-step semantics using
 the concepts of the book [Programming Language Foundations in Agda](https://plfa.github.io/).
 
 # Imports
@@ -41,9 +41,9 @@ data Value : Expr → Set where
     → Value (nat x)
 ```
 
-# Small Step
+# Small-Step
 
-Now, it will be defined the small step semantic of this programming language:
+Now, it will be defined the small-step semantic of this programming language:
 
 ```
 infixr 2 _—→_
@@ -275,7 +275,8 @@ abs-cong : ∀ {M M' N N'}
 abs-cong VM (M ∎) (N ∎) = M + N ∎
 abs-cong VM (M ∎) (N —→⟨ st ⟩ N') = M + N —→⟨ ξ₂ VM st ⟩ abs-cong VM (M ∎) N'
 abs-cong VM (M —→⟨ st ⟩ M') (N ∎) = M + N —→⟨ ξ₁ st ⟩ abs-cong VM M' (N ∎)
-abs-cong VM (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') = M + N —→⟨ ξ₁ stm ⟩ abs-cong VM M' (N —→⟨ stn ⟩ N')
+abs-cong VM (M —→⟨ stm ⟩ M') (N —→⟨ stn ⟩ N') =
+  M + N —→⟨ ξ₁ stm ⟩ abs-cong VM M' (N —→⟨ stn ⟩ N')
 ```
 
 # Parallel Reduction
