@@ -1,12 +1,12 @@
 ---
 date: 2021-08-30
-title: Using small step reduction in addition
+title: Using small-step reduction in addition
 author: Guilherme
 ---
 
 # Motivation
 
-The objective of this project is to do a minimalistic example of small step semantics using
+The objective of this project is to do a minimalistic example of small-step semantics using
 the concepts of the book [Programming Language Foundations in Agda](https://plfa.github.io/).
 
 # Imports
@@ -41,9 +41,9 @@ data Value : Expr → Set where
     → Value (nat x)
 ```
 
-# Small Step
+# Small-Step
 
-Now, it will be defined the small step semantic of this programming language:
+Now, it will be defined the small-step semantic of this programming language:
 
 ```
 infixr 2 _—→_
