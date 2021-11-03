@@ -1,6 +1,6 @@
 ---
 date: 2021-08-30
-title: Concurrency language with small step semantics
+title: Concurrency language with small-step semantics
 author: Guilherme
 ---
 
