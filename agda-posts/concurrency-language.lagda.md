@@ -1,5 +1,5 @@
 ---
-date: 2021-08-30
+date: 2021-11-03
 title: Concurrency language with small-step semantics
 author: Guilherme
 ---
@@ -7,7 +7,7 @@ author: Guilherme
 # Motivation
 
 My motivation to formalize a concurrency programming language using small-step semantics
-is to use this concept for a no deterministic programming languge.
+is to use this concept for a no deterministic programming language.
 
 # Imports
 
@@ -29,7 +29,7 @@ open import Codata.Stream using (Stream; _∷_; repeat)
 # Defining the language
 
 The programming language is a simple expression that can be a natural number,
-two concurrency programs or two programs that happen one next the other.
+two concurrency programs, or two programs that happen one next to the other.
 In the end, the main idea is that this program just returns a list of natural numbers.
 
 ```
@@ -62,7 +62,7 @@ data _—→_ : Expr → NextExpr → Set where
 ```
 
 The simplest reduction is when there is a simple program with just a natural number
-This program will be reduced to it and there is no programing remaining.
+This program will be reduced to it and there is no programming remaining.
 
 ```
   ξ||ₗ : ∀ {M M' N n}
@@ -98,7 +98,7 @@ It is the same thing of a previous step but for the right program.
     → M || N —→ n , just M
 ```
 
-It is the same thing of a previous step but for the right program.
+It is the same thing as a previous step but for the right program.
 
 ```
   ξ,, : ∀ {M M' N n}
@@ -108,7 +108,7 @@ It is the same thing of a previous step but for the right program.
 ```
 
 When there is a sequence program, the left part is reduced once and the rest of the expression
-is just the join of the both of these programs.
+is just the join of both of these programs.
 
 ```
   ξ,,∅ : ∀ {M N n}
@@ -134,7 +134,7 @@ _ = ξ||∅ᵣ ξℕ
 # Multi-step
 
 Now, it will be defined the multi-step of the language.
-It can be a zero step, so an expression `M` can go to `M` (`M —↠ M`),
+It can be a zero-step, so an expression `M` can go to `M` (`M —↠ M`),
 it can be multiple steps (that can be one, two, or any natural number)
 or it can be a step that the expression finishes.
 
@@ -176,7 +176,7 @@ _—⇀_ : Expr → List ℕ → Set
 L —⇀ xs = L —↠ xs , nothing
 ```
 
-This is small lemma that you can concat the result of two sequence expressions:
+This is a small lemma that you can concatenate the result of two sequence expressions:
 
 ```
 ,,-sequence : ∀ {M N xs ys}
@@ -189,7 +189,7 @@ This is small lemma that you can concat the result of two sequence expressions:
 
 # Single-step
 
-The single-step is just the small-step that you hide the result of the small-step in the type.
+The single-step is just the small step that you hide the result of the small step in the type.
 
 ```
 data SingleStep : Expr → Set where
@@ -199,7 +199,7 @@ data SingleStep : Expr → Set where
     → SingleStep L
 ```
 
-With the eval step, I proof that every expression has single-step associated with that.
+With the eval step, I prove that every expression has a single step associated with that.
 If the program is parallel, it will consume a boolean from the stream and
 this boolean represents which part of the program will be evaluated.
 The false represents the left part while true represents the right.
@@ -246,7 +246,7 @@ data Finished (N : Expr) : Set where
 
 An expression is finished when it is a value or when there is no more gas
 available to calculate it.
-In Agda, every computation must terminates. So it is impossible to have
+In Agda, every computation must terminate. So it is impossible to have
 an infinite loop. So when an expression takes so much time
 to finish, it runs out of gas and there is no result.
 
@@ -269,7 +269,7 @@ eval (suc gas) sxs L with eval-step sxs L
 
 The evaluation takes gas and the expression to evaluate.
 In the end, it returns the value with proof that the expression evaluates
-to this value.
+this value.
 
 Here, some examples of the evaluation:
 
