@@ -49,6 +49,7 @@ Now, it will be defined the small-step semantic of this programming language:
 ```
 NextExpr = ℕ × Maybe Expr
 ```
+
 The expression will be reduced to a natural number that it produced or
 maybe a new expression if there is still a new program to reduce.
 
@@ -61,7 +62,7 @@ data _—→_ : Expr → NextExpr → Set where
 ```
 
 The simplest reduction is when there is a simple program with just a natural number
-and it will be reduced to this natural number and there is no remanining program.
+This program will be reduced to it and there is no programing remaining.
 
 ```
   ξ||ₗ : ∀ {M M' N n}
@@ -70,8 +71,7 @@ and it will be reduced to this natural number and there is no remanining program
     → M || N —→ n , just (M' || N)
 ```
 
-If there is a parallel program, the left program will be reduced by one step
-and the natural number will be added to the list.
+If there is a parallel program, the left program will be reduced by one step.
 
 ```
   ξ||∅ₗ : ∀ {M N n}
@@ -134,7 +134,7 @@ _ = ξ||∅ᵣ ξℕ
 # Multi-step
 
 Now, it will be defined the multi-step of the language.
-It can be a zero-step, so an expression `M` can go to `M` (`M —↠ M`),
+It can be a zero step, so an expression `M` can go to `M` (`M —↠ M`),
 it can be multiple steps (that can be one, two, or any natural number)
 or it can be a step that the expression finishes.
 
@@ -200,9 +200,9 @@ data SingleStep : Expr → Set where
 ```
 
 With the eval step, I proof that every expression has single-step associated with that.
-If the program is parallel, it will be consumed a boolean from the stream and
-it represents which part of the program it will be evaluated. The false represents the left part
-while true represents the right.
+If the program is parallel, it will consume a boolean from the stream and
+this boolean represents which part of the program will be evaluated.
+The false represents the left part while true represents the right.
 
 ```
 eval-step :
@@ -223,7 +223,7 @@ eval-step (true ∷ sxs) (M || N) with eval-step (sxs .force) N
 
 # Evaluation
 
-For the definition evaluation, it will necessary to be defined when an
+For the definition of evaluation, it will necessary to be defined when an
 expression was finished in the evaluation and the steps of the evaluation.
 
 ```
@@ -246,7 +246,7 @@ data Finished (N : Expr) : Set where
 
 An expression is finished when it is a value or when there is no more gas
 available to calculate it.
-In Agda, every computation must terminate. So it is impossible to have
+In Agda, every computation must terminates. So it is impossible to have
 an infinite loop. So when an expression takes so much time
 to finish, it runs out of gas and there is no result.
 
@@ -269,7 +269,7 @@ eval (suc gas) sxs L with eval-step sxs L
 
 The evaluation takes gas and the expression to evaluate.
 In the end, it returns the value with proof that the expression evaluates
-this value.
+to this value.
 
 Here, some examples of the evaluation:
 
