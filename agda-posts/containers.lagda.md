@@ -34,6 +34,9 @@ open import Data.Product using (_,_; proj₁; proj₂)
 open import Data.Sum hiding (map)
 open import Data.Nat
 open import Data.Fin renaming (zero to fzero; suc to fsuc) hiding (_+_)
+
+variable
+  A : Set
 ```
 
 # Definition
@@ -56,29 +59,29 @@ In this example, the shape is the Unit type (the set with just one element) and 
 Now, it is time to interpret this container:
 
 ```
-  Double' : Set → Set
-  Double' = ⟦ Two ⟧
+  Tuple' : Set → Set
+  Tuple' = ⟦ Two ⟧
 ```
 
 And to add their constructors and destructors:
 
 ```
-  mkDouble' : ∀ {A} → (x y : A) → Double' A
-  mkDouble' x y .proj₁ = _
-  mkDouble' x y .proj₂ true  = x
-  mkDouble' x y .proj₂ false = y
+  mkTuple' : (x y : A) → Tuple' A
+  mkTuple' x y .proj₁ = _
+  mkTuple' x y .proj₂ true  = x
+  mkTuple' x y .proj₂ false = y
 
-  proj1 : ∀ {A} → Double' A → A
+  proj1 : Tuple' A → A
   proj1 (_ , p) = p true
 
-  proj2 : ∀ {A} → Double' A → A
+  proj2 : Tuple' A → A
   proj2 (_ , p) = p false
 ```
 
 To test them, I created a tuple that the first element is false and the second is true.
 
 ```
-  myTuple = mkDouble' false true
+  myTuple = mkTuple' false true
 ```
 
 When containers really shine is when we get type classes and properties of them for free.
@@ -107,19 +110,19 @@ module _ where
 The rest is almost the same:
 
 ```
-  Double' : Set → Set
-  Double' = ⟦ Two ⟧
+  Tuple' : Set → Set
+  Tuple' = ⟦ Two ⟧
 
-  mkDouble' : ∀ {A} → (x y : A) → Double' A
-  mkDouble' x y = _ , [ F.const x , F.const y ]
+  mkTuple' : (x y : A) → Tuple' A
+  mkTuple' x y = _ , [ F.const x , F.const y ]
 
-  proj1 : ∀ {A} → Double' A → A
+  proj1 : Tuple' A → A
   proj1 (_ , p) = p (inj₁ _)
 
-  proj2 : ∀ {A} → Double' A → A
+  proj2 : Tuple' A → A
   proj2 (_ , p) = p (inj₂ _)
 
-  myTuple = mkDouble' false true
+  myTuple = mkTuple' false true
   inverted = map not myTuple
 
   _ : proj1 inverted ≡ true
@@ -151,20 +154,20 @@ List = ⟦ ListC ⟧
 Getting their constructors and destructors:
 
 ```
-[] : {A : Set} → List A
+[] : List A
 [] = 0 , λ ()
 
 infixr 5 _∷_
-_∷_ : {A : Set} → A → List A → List A
+_∷_ : A → List A → List A
 (x ∷ (size , fxs)) .proj₁           = suc size
 (x ∷ (size , fxs)) .proj₂ fzero     = x
 (x ∷ (size , fxs)) .proj₂ (fsuc xs) = fxs xs
 
-head' : {A : Set} → List A → Maybe A
+head' : List A → Maybe A
 head' (zero , _)    = nothing
 head' (suc n , fxs) = just (fxs fzero)
 
-tail' : {A : Set} → List A → List A
+tail' : List A → List A
 tail' (zero ,    _) = 0 , λ ()
 tail' (suc n , fxs) = n , fxs F.∘ fsuc
 ```
