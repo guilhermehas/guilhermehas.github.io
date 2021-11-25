@@ -55,8 +55,9 @@ maybe a new command if there is still a new program to reduce.
 
 ```
 variable
-  m n : ℕ
-  M M' N N' : Command
+  x m n : ℕ
+  xs ys : List ℕ
+  L M M' N N' : Command
 
 infixr 2 _—→_
 data _—→_ : Command → NextCommand → Set where
@@ -146,18 +147,18 @@ data _—↠_ : Command → List ℕ × Maybe Command → Set where
       ----------------
     → M —↠ [] , just M
 
-  _—→⟨_⟩_ : ∀ L {x xs M N}
+  _—→⟨_⟩_ : ∀ L {N}
     → L —→ x , just M
     → M —↠ xs , N
       ---------------
     → L —↠ x ∷ xs , N
 
-  _—→⟨⟩_ : ∀ L {x}
+  _—→⟨⟩_ : ∀ L
     → L —→ x , nothing
       --------------------
     → L —↠ [ x ] , nothing
 
-begin_ : ∀ {M N}
+begin_ : ∀ {N}
   → M —↠ N
     ------
   → M —↠ N
@@ -175,8 +176,8 @@ L —⇀ xs = L —↠ xs , nothing
 This is a small lemma that you can concatenate the result of two sequence commands:
 
 ```
-,,-sequence : ∀ {M N xs ys}
-  → M —⇀ xs
+,,-sequence :
+    M —⇀ xs
   → N —⇀ ys
   → M ,, N —⇀ xs ++ ys
 ,,-sequence (_ —→⟨⟩ st1) st2 = _ ,, _ —→⟨ ξ,,∅ st1 ⟩ st2
@@ -189,7 +190,7 @@ The single-step is just the small step that you hide the result of the small ste
 
 ```
 data SingleStep : Command → Set where
-  singleStep : ∀ {L} n L'
+  singleStep : ∀ n L'
     → L —→ n , L'
       ----------
     → SingleStep L
@@ -224,7 +225,7 @@ command was finished in the evaluation and the steps of the evaluation.
 
 ```
 data Steps : Command → Set where
-  steps : ∀ {L} xs
+  steps : ∀ xs
     → L —⇀ xs
       ----------
     → Steps L
