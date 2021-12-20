@@ -19,11 +19,16 @@ Importing libraries of Agda Stdlib:
 open import Level
 open import Algebra.Core
 open import Data.Nat hiding (_+_; _*_; _≟_)
+open import Data.Nat.Coprimality as C
 open import Data.Bool hiding (_≟_)
 open import Data.Vec
 open import Data.Product
-open import Data.Rational as ℚ renaming (_+_ to _+q_; _*_ to _*q_; _/_ to _/q_) hiding (_≟_)
-open import Data.Integer renaming (_+_ to _+z_; _*_ to _*z_; _-_ to _-z_) hiding (_≟_)
+open import Data.Rational as ℚ
+  renaming (_+_ to _+q_; _*_ to _*q_; _/_ to _/q_)
+  hiding (_≟_; _÷_; 1/_)
+open import Data.Integer
+  renaming (_+_ to _+z_; _*_ to _*z_; _-_ to _-z_)
+  hiding (_≟_)
 open import Data.Integer.Instances
 open import Relation.Binary
 open import Relation.Binary.PropositionalEquality
@@ -63,7 +68,7 @@ record Measure (unit : Unit) : Set where
     measure : ℚ
 ```
 
-These variables and this `Op2` function will be used later.
+These variables and this `Op2` function will be used later:
 
 ```
 private
@@ -110,11 +115,23 @@ open MeasureUnit
 
 ### Operations
 
+This is already defined in the recent library, but it is not in the old Agda Stdlib.
+
+```
+1/_ : (p : ℚ) → .{{_ : ℚ.NonZero p}} → ℚ
+1/ mkℚ +[1+ n ] d prf = mkℚ +[1+ d ] n (C.sym prf)
+1/ mkℚ -[1+ n ] d prf = mkℚ -[1+ d ] n (C.sym prf)
+
+_÷_ : (p q : ℚ) → .{{_ : ℚ.NonZero q}} → ℚ
+p ÷ q = p *q (1/ q)
+```
+
 To multiply and divide measure units, both the measure and the unit should be multiplied and divided respectively.
 
 ```
 _*m_ : Op₂ MeasureUnit
 (mA ** uA) *m (mB ** uB) = (mA *q mB) ** (uA * uB)
+
 
 _/m_ : (a b : MeasureUnit) ⦃ _ : ℚ.NonZero (b .measure) ⦄ → MeasureUnit
 (mA ** uA) /m (mB ** uB) = (mA ÷ mB) ** (uA / uB)
