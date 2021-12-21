@@ -19,7 +19,6 @@ Importing libraries of Agda Stdlib:
 open import Level
 open import Algebra.Core
 open import Data.Nat hiding (_+_; _*_; _≟_)
-open import Data.Nat.Coprimality as C
 open import Data.Bool hiding (_≟_)
 open import Data.Vec
 open import Data.Product
@@ -35,6 +34,7 @@ open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary
 open import Relation.Nullary.Decidable
 open import Function
+open import internal-library
 ```
 
 # Minimalist Case
@@ -114,17 +114,6 @@ open MeasureUnit
 ```
 
 ### Operations
-
-This is already defined in the recent library, but it is not in the old Agda Stdlib.
-
-```
-1/_ : (p : ℚ) → .{{_ : ℚ.NonZero p}} → ℚ
-1/ mkℚ +[1+ n ] d prf = mkℚ +[1+ d ] n (C.sym prf)
-1/ mkℚ -[1+ n ] d prf = mkℚ -[1+ d ] n (C.sym prf)
-
-_÷_ : (p q : ℚ) → .{{_ : ℚ.NonZero q}} → ℚ
-p ÷ q = p *q (1/ q)
-```
 
 To multiply and divide measure units, both the measure and the unit should be multiplied and divided respectively.
 
