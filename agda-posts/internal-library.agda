@@ -1,3 +1,4 @@
+open import Level
 open import Data.Rational as ℚ
   renaming (_+_ to _+q_; _*_ to _*q_; _/_ to _/q_)
   hiding (_≟_; _÷_; 1/_)
@@ -7,7 +8,13 @@ open import Data.Integer
 open import Data.Bool
 open import Data.Nat.Coprimality as C
 
-_<?>_ : (x y : Set) → Bool → Set
+private variable
+  ℓ ℓ' : Level
+
+Op2 : Set ℓ → Set ℓ' → Set _
+Op2 A B = A → A → B
+
+_<?>_ :  Op2 Set (Bool → Set)
 (x <?> y) true  = x
 (x <?> y) false = y
 
