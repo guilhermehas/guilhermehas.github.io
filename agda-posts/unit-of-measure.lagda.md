@@ -18,16 +18,16 @@ Importing libraries of Agda Stdlib:
 ```
 open import Level
 open import Algebra.Core
-open import Data.Nat hiding (_+_; _*_; _≟_)
+open import Data.Nat hiding (_+_; _*_; _≟_; NonZero)
 open import Data.Bool hiding (_≟_)
 open import Data.Vec
 open import Data.Product
 open import Data.Rational as ℚ
   renaming (_+_ to _+q_; _*_ to _*q_; _/_ to _/q_)
-  hiding (_≟_; _÷_; 1/_)
+  hiding (_≟_; _÷_; 1/_; NonZero; -_)
 open import Data.Integer
   renaming (_+_ to _+z_; _*_ to _*z_; _-_ to _-z_)
-  hiding (_≟_)
+  hiding (_≟_; NonZero)
 open import Data.Integer.Instances
 open import Relation.Binary
 open import Relation.Binary.PropositionalEquality
@@ -66,6 +66,10 @@ record Measure (dimensional : Dimensional) : Set where
   constructor ⟦_⟧
   field
     measure : ℚ
+  NonZero : Set
+  NonZero = ℚ.NonZero measure
+
+open Measure
 ```
 
 These variables will be used later:
@@ -74,7 +78,7 @@ These variables will be used later:
 private
   variable
     ℓ ℓ' : Level
-    d : Dimensional
+    d d₁ d₂ : Dimensional
 ```
 
 ### Operations
@@ -94,6 +98,63 @@ _*_ : Op₂ Dimensional
 
 _/_ : Op₂ Dimensional
 (m^ mA s^ sA) / (m^ mB s^ sB) = m^ (mA -z mB) s^ (sA -z sB)
+```
+
+For multiplication and division of measures:
+
+```
+_*d_ : Measure d₁ → Measure d₂ → Measure (d₁ * d₂)
+⟦ x ⟧ *d ⟦ y ⟧ = ⟦ x *q y ⟧
+
+_/d_ : Measure d₁ → (y : Measure d₂) → ⦃ NonZero y ⦄ → Measure (d₁ / d₂)
+⟦ x ⟧ /d ⟦ y ⟧ = ⟦ x ÷ y ⟧
+```
+
+### Defining equations
+
+One of the simplest equations in Physics are `distance = speed * time` and `speed = distance / time`.
+Both will be defined in the next lines:
+
+```
+ud = m^ (+ 1)
+ut = s^ (+ 1)
+uv = m^ + 1 s^ (- (+ 1))
+
+distance : (speed : Measure uv)
+           (time  : Measure ut)
+                  → Measure ud
+distance speed time = speed *d time
+
+speed : (distance : Measure ud)
+        (time     : Measure ut) ⦃ _ : NonZero time ⦄
+                  → Measure uv
+speed distance time = distance /d time
+```
+
+
+### Examples
+
+These are some examples of operations:
+
+```
+private module tests where
+  ⦅_⦆ : ℕ → Measure d
+  ⦅ n ⦆ = ⟦ + n /q 1 ⟧
+
+  dist : Measure ud
+  dist = ⦅ 6 ⦆
+
+  speed' : Measure uv
+  speed' = ⦅ 3 ⦆
+
+  time : Measure ut
+  time = ⦅ 2 ⦆
+
+  _ : speed' ≡ speed dist time
+  _ = refl
+
+  _ : dist ≡ distance speed' time
+  _ = refl
 ```
 
 ## Measure and Dimensional Types
