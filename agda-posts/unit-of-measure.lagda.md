@@ -191,6 +191,8 @@ For example, the area dimensional is `m^2` and the meter power is 2.
   (s^ z) s = z
 ```
 
+## Measure Type
+
 The measure has its dimensional in its type like in the last code.
 
 ```
@@ -207,6 +209,8 @@ The measure has its dimensional in its type like in the last code.
 
   open Measure
 ```
+
+### Operations
 
 The multiplication of two measures is a function that returns the sum of two-dimension.
 And the division is the subtraction.
@@ -228,6 +232,8 @@ For multiplication and division of measures:
   _/d_ : Measure d₁ → (y : Measure d₂) → ⦃ NonZero y ⦄ → Measure (d₁ /u d₂)
   ⟦ x ⟧ /d ⟦ y ⟧ = ⟦ x ÷ y ⟧
 ```
+
+### Defining equations
 
 The dimensional of distance is `m`, time is `s`, and velocity is `m/s`.
 
@@ -270,6 +276,8 @@ Speed is defined as `distance/time`.
                     → Measure uv
   speed distance time = distance /d time
 ```
+
+### Examples
 
 These are some examples of operations:
 
