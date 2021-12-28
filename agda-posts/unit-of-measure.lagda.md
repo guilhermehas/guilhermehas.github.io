@@ -158,7 +158,7 @@ These are some examples of operations:
     time : Measure ut
     time = ⦅ 2 ⦆
 
-    _ : speed' ≡ speed dist time
+    _ : speed' ≡ speed dist time ⦃ _ ⦄
     _ = refl
 
     _ : dist ≡ distance speed' time
@@ -295,6 +295,6 @@ These are some examples of operations:
     time : Measure ut
     time = ⦅ 2 ⦆
 
-    _ : speed' ≡ speed dist time
+    _ : speed' ≡ speed dist time ⦃ _ ⦄
     _ = refl
 ```
