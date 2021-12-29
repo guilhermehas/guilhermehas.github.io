@@ -419,7 +419,9 @@ For example, `km^2` will return `1.000.000` (that is `1.000^2`).
 ```
 
 The Unit Power `m^1 * km^(-1) * s^0 * ms^(-2)`
-will be transformed into `m^2 * (1.000 * m)^(-1) * s^0 * (1/1000 * s)^(-2)`
+will be transformed into
+
+`m^2 * (1.000 * m)^(-1) * s^0 * (1/1000 * s)^(-2)`
 ≡ `1.000 * m^1 * s^(-2)`.
 
 ```
@@ -499,7 +501,7 @@ Some functions to define examples in a better way.
   _⋆_ : ℚ → (u : UnitPower) → Measure u
   q ⋆ _ = ⟦ q ⟧
 
-  _⋆*_ = λ q u → ((+ q) /q 1) ⋆ u
+  _⋆⋆_ = λ q u → ((+ q) /q 1) ⋆ u
 
   m^_ : ℤ → UnitPower
   (m^ z) m = z
@@ -527,13 +529,13 @@ it requires extensionality.
 
 ```
   private
-    _ : (1 ⋆* (m^ (+ 1))) +m (2 ⋆* (m^ (+ 1)))
-      ≡ (3 ⋆* (m^ (+ 1)))
+    _ : (1 ⋆⋆ (m^ (+ 1))) +m (2 ⋆⋆ (m^ (+ 1)))
+      ≡ (3 ⋆⋆ (m^ (+ 1)))
     _ = refl
 
     m/s = (m^ (+ 1)) *u (s^ (- (+ 1)))
 
-    _ : (10 ⋆* m/s) +m (20 ⋆* m/s)
-      ≡ (30 ⋆* m/s)
+    _ : (10 ⋆⋆ m/s) +m (20 ⋆⋆ m/s)
+      ≡ (30 ⋆⋆ m/s)
     _ = refl
 ```
