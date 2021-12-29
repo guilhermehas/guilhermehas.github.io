@@ -330,6 +330,8 @@ module DimensionalUnit where
   AllDimensional = distance ∷ time ∷ []
 ```
 
+## Conversion between Unit and Dimensional
+
 Each unit has a dimensional associated with that.
 The dimensional of meter and kilometer is distance
 and the dimensional of seconds and milliseconds is time.
@@ -352,6 +354,8 @@ and the dimensional of seconds and milliseconds is time.
   StandardUnit? ms = false
 ```
 
+## Unit Proportion
+
 Each unit has a value proportional to the standard measure.
 The standard measure of distance is in meters and time in seconds.
 So their values are one.
@@ -368,6 +372,8 @@ and milliseconds is 1/1000 of a second, so its value is 1/1000.
 
 Unit Power is the power of each unit.
 For example: `m^2 * km^(- 1) * s^5 * ms^0`.
+
+## Unit and Dimensional Power
 
 ```
   UnitPower = Unit → ℤ
@@ -394,6 +400,8 @@ Dimensional Value will return the value measured in the standard measure.
     else + 0
 ```
 
+## Normalization and Value associated with Unit Power
+
 For normalization, it transforms Unit Power into Dimensional Power and after to Unit Power.
 In this way, it eliminates units that are not standard such as kilometers.
 
@@ -417,6 +425,8 @@ For example, `km^2` will return `1.000.000` (that is `1.000^2`).
   UnitPower→DimensionalValue up = prodℚ
     (mapl (λ x → _**_ (UnitProportion x) (up x) ⦃ NonZeroUnit x ⦄) AllUnit)
 ```
+
+### Examples
 
 The Unit Power `m^1 * km^(-1) * s^0 * ms^(-2)`
 will be transformed into
@@ -451,6 +461,8 @@ will be transformed into
     _ = refl
 ```
 
+## Unit Power operations
+
 The multiplication and division of units are the same as the last code.
 
 ```
@@ -461,7 +473,7 @@ The multiplication and division of units are the same as the last code.
   (f /u g) x = f x -z g x
 ```
 
-The definition of measure also looks like the same as the last code.
+The definition of measure also looks the same as the last code.
 
 ```
   record Measure (_ : UnitPower) : Set where
@@ -473,6 +485,8 @@ The definition of measure also looks like the same as the last code.
 
   open Measure
 ```
+
+## Measure operations
 
 The difference now between this and the last code is that now the unit is normalized.
 So units that are not standard such as kilometers will be removed.
@@ -494,6 +508,8 @@ So units that are not standard such as kilometers will be removed.
   _+m_ : Measure up → Measure up → Measure up
   ⟦ x ⟧ +m ⟦ y ⟧ = ⟦ x +q y ⟧
 ```
+
+## Simple functions of Unit Power
 
 Some functions to define examples in a better way.
 
@@ -526,6 +542,8 @@ These are some examples of addition.
 The problem with the product is that Unit Power is a function,
 so it is necessary to prove that two functions are equal and
 it requires extensionality.
+
+## Tests
 
 ```
   private
