@@ -21,9 +21,10 @@ module unit-of-measure where
 open import Axiom.Extensionality.Propositional
 open import Level
 open import Algebra.Core
-open import Data.Nat hiding (_+_; _*_; _≟_; NonZero)
+open import Data.Nat hiding (_+_; _*_; _≟_; NonZero) renaming (pred to predn)
 open import Data.Bool hiding (_≟_)
-open import Data.Vec
+open import Data.List renaming (map to mapl)
+open import Data.Vec hiding (foldr; filter)
 open import Data.Product
 open import Data.Rational as ℚ
   renaming (_+_ to _+q_; _*_ to _*q_; _/_ to _/q_)
@@ -296,5 +297,243 @@ These are some examples of operations:
     time = ⦅ 2 ⦆
 
     _ : speed' ≡ speed dist time ⦃ _ ⦄
+    _ = refl
+```
+
+# Dimensional Unit
+
+In this code, Dimensional and Unit are distinct.
+Dimensional is something that can be measured
+and Unit is the unit of measure.
+For example, time and distance are two dimensions,
+and meter is a unit of measure of distance.
+
+```
+module DimensionalUnit where
+
+  data Dimensional : Set where
+    distance time : Dimensional
+
+  data Unit : Set where
+    m km s ms : Unit
+
+  _≟d_ : (x y : Dimensional) → Dec (x ≡ y)
+  distance ≟d distance = yes refl
+  distance ≟d time     = no (λ ())
+  time     ≟d distance = no (λ ())
+  time     ≟d time     = yes refl
+
+  AllUnit : List Unit
+  AllUnit = m ∷ km ∷ s ∷ ms ∷ []
+
+  AllDimensional : List Dimensional
+  AllDimensional = distance ∷ time ∷ []
+```
+
+Each unit has a dimensional associated with that.
+The dimensional of meter and kilometer is distance
+and the dimensional of seconds and milliseconds is time.
+
+```
+  UnitDimensional : Unit → Dimensional
+  UnitDimensional m  = distance
+  UnitDimensional km = distance
+  UnitDimensional s  = time
+  UnitDimensional ms = time
+
+  DimensionalUnit : Dimensional → Unit
+  DimensionalUnit distance = m
+  DimensionalUnit time     = s
+
+  StandardUnit? : Unit → Bool
+  StandardUnit? m  = true
+  StandardUnit? km = false
+  StandardUnit? s  = true
+  StandardUnit? ms = false
+```
+
+Each unit has a value proportional to the standard measure.
+The standard measure of distance is in meters and time in seconds.
+So their values are one.
+But kilometer is 1000 times meters so its value is 1000,
+and milliseconds is 1/1000 of a second, so its value is 1/1000.
+
+```
+  UnitProportion : Unit → ℚ
+  UnitProportion m  = 1ℚ
+  UnitProportion km = + 1000 /q 1
+  UnitProportion s  = 1ℚ
+  UnitProportion ms = + 1 /q 1000
+```
+
+Unit Power is the power of each unit.
+For example: `m^2 * km^(- 1) * s^5 * ms^0`.
+
+```
+  UnitPower = Unit → ℤ
+```
+
+Dimensional power is the same thing as Unit power, but for dimensional.
+Dimensional Value will return the value measured in the standard measure.
+
+```
+  DimensionalPower = Dimensional → ℤ
+
+  private
+    variable
+      up up₁ up₂ : UnitPower
+
+  UnitPower→DimensionalPower : UnitPower → DimensionalPower
+  UnitPower→DimensionalPower up dim =
+    sumℤ (mapl up (filter ((dim ≟d_) ∘ UnitDimensional) AllUnit))
+
+  DimensionalPower→UnitPower : DimensionalPower → UnitPower
+  DimensionalPower→UnitPower dp unit =
+    if StandardUnit? unit then
+    sumℤ (mapl dp (filter (_≟d UnitDimensional unit) AllDimensional))
+    else + 0
+```
+
+For normalization, it transforms Unit Power into Dimensional Power and after to Unit Power.
+In this way, it eliminates units that are not standard such as kilometers.
+
+```
+  normalizeUnit : UnitPower → UnitPower
+  normalizeUnit = DimensionalPower→UnitPower ∘ UnitPower→DimensionalPower
+
+  NonZeroUnit : ∀ x → ℚ.NonZero (UnitProportion x)
+  NonZeroUnit m  = _
+  NonZeroUnit km = _
+  NonZeroUnit s  = _
+  NonZeroUnit ms = _
+```
+
+In this function, it gets the product of values that are not standard with their power.
+For example, `km^2` will return `1.000.000` (that is `1.000^2`).
+
+
+```
+  UnitPower→DimensionalValue : UnitPower → ℚ
+  UnitPower→DimensionalValue up = prodℚ
+    (mapl (λ x → _**_ (UnitProportion x) (up x) ⦃ NonZeroUnit x ⦄) AllUnit)
+```
+
+The Unit Power `m^1 * km^(-1) * s^0 * ms^(-2)`
+will be transformed into `m^2 * (1.000 * m)^(-1) * s^0 * (1/1000 * s)^(-2)`
+≡ `1.000 * m^1 * s^(-2)`.
+
+```
+  private
+    up-ex : UnitPower
+    up-ex m = + 2
+    up-ex km = - (+ 1)
+    up-ex s = + 0
+    up-ex ms = - (+ 2)
+
+    _ : UnitPower→DimensionalValue up-ex ≡ + 1000 /q 1
+    _ = refl
+
+    _ : UnitPower→DimensionalPower up-ex distance ≡ + 1
+    _ = refl
+
+    _ : normalizeUnit up-ex m ≡ + 1
+    _ = refl
+
+    _ : normalizeUnit up-ex km ≡ + 0
+    _ = refl
+
+    _ : UnitPower→DimensionalPower up-ex time ≡ - (+ 2)
+    _ = refl
+
+    _ : normalizeUnit up-ex s ≡ - (+ 2)
+    _ = refl
+```
+
+The multiplication and division of units are the same as the last code.
+
+```
+  _*u_ : Op₂ UnitPower
+  (f *u g) x = f x +z g x
+
+  _/u_ : Op₂ UnitPower
+  (f /u g) x = f x -z g x
+```
+
+The definition of measure also looks like the same as the last code.
+
+```
+  record Measure (_ : UnitPower) : Set where
+    constructor ⟦_⟧
+    field
+      measure : ℚ
+    NonZero : Set
+    NonZero = ℚ.NonZero measure
+
+  open Measure
+```
+
+The difference now between this and the last code is that now the unit is normalized.
+So units that are not standard such as kilometers will be removed.
+
+```
+  _*m_ : Measure up₁ → Measure up₂ → Measure (normalizeUnit (up₁ *u up₂))
+  _*m_ {up₁} {up₂} ⟦ x ⟧ ⟦ y ⟧ =
+    ⟦ UnitPower→DimensionalValue up₁ *q UnitPower→DimensionalValue up₂ *q x *q y ⟧
+
+  _/m_ : Measure up₁ → (y : Measure up₂) ⦃ _ : NonZero y ⦄ → Measure (normalizeUnit (up₁ *u up₂))
+  _/m_ {up₁} {up₂} ⟦ x ⟧  ⟦ y ⟧ ⦃ nzy ⦄ = ⟦ _÷_
+    (UnitPower→DimensionalValue up₁ *q x)
+    (UnitPower→DimensionalValue up₂ *q y)
+    ⦃ trustMe ⦄ ⟧
+    where
+      postulate
+        trustMe : ℚ.NonZero (UnitPower→DimensionalValue up₂ *q y)
+
+  _+m_ : Measure up → Measure up → Measure up
+  ⟦ x ⟧ +m ⟦ y ⟧ = ⟦ x +q y ⟧
+```
+
+Some functions to define examples in a better way.
+
+```
+  _⋆_ : ℚ → (u : UnitPower) → Measure u
+  q ⋆ _ = ⟦ q ⟧
+
+  _⋆*_ = λ q u → ((+ q) /q 1) ⋆ u
+
+  m^_ : ℤ → UnitPower
+  (m^ z) m = z
+  (m^ z) km = + 0
+  (m^ z) s = + 0
+  (m^ z) ms = + 0
+
+  km^_ : ℤ → UnitPower
+  (km^ z) m = + 0
+  (km^ z) km = z
+  (km^ z) s = + 0
+  (km^ z) ms = + 0
+
+  s^_ : ℤ → UnitPower
+  (s^ z) m = + 0
+  (s^ z) km = + 0
+  (s^ z) s = z
+  (s^ z) ms = + 0
+```
+
+These are some examples of addition.
+The problem with the product is that Unit Power is a function,
+so it is necessary to prove that two functions are equal and
+it requires extensionality.
+
+```
+  private
+    _ : (1 ⋆* (m^ (+ 1))) +m (2 ⋆* (m^ (+ 1)))
+      ≡ (3 ⋆* (m^ (+ 1)))
+    _ = refl
+
+    m/s = (m^ (+ 1)) *u (s^ (- (+ 1)))
+
+    _ : (10 ⋆* m/s) +m (20 ⋆* m/s)
+      ≡ (30 ⋆* m/s)
     _ = refl
 ```
