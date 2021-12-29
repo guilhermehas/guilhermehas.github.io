@@ -538,12 +538,12 @@ Some functions to define examples in a better way.
   (s^ z) ms = + 0
 ```
 
+## Tests
+
 These are some examples of addition.
 The problem with the product is that Unit Power is a function,
 so it is necessary to prove that two functions are equal and
 it requires extensionality.
-
-## Tests
 
 ```
   private
