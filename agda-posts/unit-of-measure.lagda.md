@@ -24,7 +24,9 @@ open import Algebra.Core
 open import Data.Nat hiding (_+_; _*_; _≟_; NonZero) renaming (pred to predn)
 open import Data.Bool hiding (_≟_)
 open import Data.List renaming (map to mapl)
-open import Data.Vec hiding (foldr; filter)
+open import Data.Vec
+  hiding (foldr; filter)
+  renaming (zipWith to zipWithV; tabulate to tabulateV; lookup to lookupv)
 open import Data.Product
 open import Data.Rational as ℚ
   renaming (_+_ to _+q_; _*_ to _*q_; _/_ to _/q_)
@@ -33,6 +35,8 @@ open import Data.Integer
   renaming (_+_ to _+z_; _*_ to _*z_; _-_ to _-z_)
   hiding (_≟_; NonZero)
 open import Data.Integer.Instances
+open import Data.Fin
+open import Data.Fin.Properties renaming (_≟_ to _≟f_)
 open import Relation.Binary
 open import Relation.Binary.PropositionalEquality hiding (Extensionality)
 open import Relation.Nullary
@@ -520,21 +524,21 @@ Some functions to define examples in a better way.
   _⋆⋆_ = λ q u → ((+ q) /q 1) ⋆ u
 
   m^_ : ℤ → UnitPower
-  (m^ z) m = z
+  (m^ z) m  = z
   (m^ z) km = + 0
-  (m^ z) s = + 0
+  (m^ z) s  = + 0
   (m^ z) ms = + 0
 
   km^_ : ℤ → UnitPower
-  (km^ z) m = + 0
+  (km^ z) m  = + 0
   (km^ z) km = z
-  (km^ z) s = + 0
+  (km^ z) s  = + 0
   (km^ z) ms = + 0
 
   s^_ : ℤ → UnitPower
-  (s^ z) m = + 0
+  (s^ z) m  = + 0
   (s^ z) km = + 0
-  (s^ z) s = z
+  (s^ z) s  = z
   (s^ z) ms = + 0
 ```
 
@@ -555,5 +559,244 @@ it requires extensionality.
 
     _ : (10 ⋆⋆ m/s) +m (20 ⋆⋆ m/s)
       ≡ (30 ⋆⋆ m/s)
+    _ = refl
+```
+
+# Dimensional Units in Vector
+
+The problem with the last approach is that it is not possible to infer
+automatically that two functions are equal.
+But `Fin n → A` is isomorphic to `Vec A n` and the compiler infer easily
+that two vectors are equal.
+So it is better to use vectors instead of functions.
+
+```
+module DimensionalUnitVector where
+  DimensionalSize = 2
+  UnitSize = 4
+
+  Dimensional = Vec ℤ DimensionalSize
+  Unit = Vec ℤ UnitSize
+```
+
+We have two dimensional. Distance is the first and time is the second.
+
+```
+  distance : Fin DimensionalSize
+  distance = Fin.zero
+
+  time : Fin DimensionalSize
+  time = Fin.suc Fin.zero
+```
+
+For each unit (m, km, s, ms), there is a dimensional associated with that.
+It is in the vector `UnitDimensional`.
+
+```
+  UnitDimensional : Vec (Fin DimensionalSize) UnitSize
+  UnitDimensional = distance ∷ distance ∷ time ∷ time ∷ []
+```
+
+Unit proportion is the same in the case above.
+But the difference is that it has to come with a proof that all elements
+are non-zero.
+
+```
+  UnitProportionNZ : Vec (Σ[ q ∈ ℚ ] ℚ.NonZero q) UnitSize
+  UnitProportionNZ = (1ℚ , _) ∷ (+ 1000 /q 1 , _)∷ ((1ℚ , _)) ∷ (+ 1 /q 1000 , _) ∷ []
+```
+
+Meters and seconds are unit standards of distance and time respectively.
+
+```
+  UnitStandard : Vec Bool UnitSize
+  UnitStandard = true ∷ false ∷ true ∷ false ∷ []
+```
+
+These are the units of meters, kilometers, seconds, and milliseconds.
+
+```
+  m^_ : ℤ → Unit
+  m^ z = z ∷ + 0 ∷ + 0 ∷ + 0 ∷ []
+
+  km^_ : ℤ → Unit
+  km^ z = + 0 ∷ z ∷ + 0 ∷ + 0 ∷ []
+
+  s^_ : ℤ → Unit
+  s^ z = + 0 ∷ + 0 ∷ z ∷ + 0 ∷ []
+
+  ms^_ : ℤ → Unit
+  ms^ z = + 0 ∷ + 0 ∷ + 0 ∷ z ∷ []
+```
+
+To multiplicate the unit, it is just necessary to add each element of both vectors,
+and to divide, it is necessary to subtract.
+
+```
+  _*u_ : Op₂ Unit
+  _*u_ = zipWithV _+z_
+
+  _/u_ : Op₂ Unit
+  _/u_ = zipWithV _-z_
+```
+
+These functions are the same as in the case of the Dimensional Unit above.
+
+```
+  Unit→Dimensional : Unit → Dimensional
+  Unit→Dimensional un =
+    tabulateV λ dpos → sumFin λ unp →
+    if (dpos ≟f lookupv UnitDimensional unp) .does
+    then lookupv un unp else + 0
+
+  Dimensional→Unit : Dimensional → Unit
+  Dimensional→Unit dim =
+    tabulateV λ unpos →
+      if lookupv UnitStandard unpos
+      then lookupv dim (lookupv UnitDimensional unpos) else + 0
+
+  normalizeUnit : Unit → Unit
+  normalizeUnit = Dimensional→Unit ∘ Unit→Dimensional
+
+  Unit→Measure : Unit → ℚ
+  Unit→Measure unit = prodℚv $ zipWithV (λ (q , nz) un → _**_ q un ⦃ nz ⦄) UnitProportionNZ unit
+```
+
+These are some examples of the use of the functions above.
+
+```
+  private
+    m = m^ (+ 1)
+    s = s^ (+ 1)
+    ms = ms^ (+ 1)
+    m/s = m /u s
+    km = km^ (+ 1)
+
+    _ : Unit→Dimensional m ≡ + 1 ∷ + 0 ∷ []
+    _ = refl
+
+    _ : Unit→Dimensional m/s ≡ + 1 ∷ - (+ 1) ∷ []
+    _ = refl
+
+    _ : Unit→Dimensional km ≡ + 1 ∷ + 0 ∷ []
+    _ = refl
+
+    _ : normalizeUnit m ≡ + 1 ∷ + 0 ∷ + 0 ∷ + 0 ∷ []
+    _ = refl
+
+    _ : normalizeUnit km ≡ + 1 ∷ + 0 ∷ + 0 ∷ + 0 ∷ []
+    _ = refl
+
+    _ : normalizeUnit m/s ≡ + 1 ∷ + 0 ∷ - (+ 1) ∷ + 0 ∷ []
+    _ = refl
+```
+
+The Measure definition is the same as the case above.
+
+```
+  record Measure (unit : Unit) : Set where
+    constructor ⟦_⟧
+    field
+      measure : ℚ
+    NonZero : Set
+    NonZero = ℚ.NonZero measure
+```
+
+The `std` function got the measure in the standard unit (such as a meter or a second).
+
+```
+    std : ℚ
+    std = measure *q Unit→Measure unit
+```
+
+```
+  open Measure
+
+  private
+    variable
+      u u₁ u₂ : Unit
+```
+
+The definition of multiplication, addition, and division is like the case above,
+except that they use the `std` function,
+
+```
+  _*m_ : Measure u₁ → Measure u₂ → Measure (normalizeUnit (u₁ *u u₂))
+  x *m y = ⟦ std x *q std y ⟧
+
+  _/m_ : Measure u₁ → (y : Measure u₂) → ⦃ _ : NonZero y ⦄ → Measure (normalizeUnit (u₁ /u u₂))
+  x /m y = ⟦ _÷_ (std x) (std y) ⦃ trustMe ⦄ ⟧
+    where
+      postulate
+        trustMe : ℚ.NonZero (std y)
+
+  _+m_ : Measure u → Measure u → Measure u
+  ⟦ x ⟧ +m ⟦ y ⟧ = ⟦ x +q y ⟧
+
+  _⋆_ : ℚ → (u : Unit) → Measure u
+  q ⋆ _ = ⟦ q ⟧
+
+  _⋆⋆_ = λ q u → ((+ q) /q 1) ⋆ u
+
+  distanceF : Measure m/s
+            → Measure s
+            → Measure m
+  distanceF speed time = speed *m time
+
+  speed : (distance : Measure m)
+          (time     : Measure s) ⦃ _ : NonZero time ⦄
+                    → Measure m/s
+  speed distance time = distance /m time
+```
+
+Some examples using the code.
+
+```
+  private
+    ⦅_⦆ : ℕ → Measure u
+    ⦅ n ⦆ = ⟦ + n /q 1 ⟧
+
+    dist : Measure m
+    dist = ⦅ 6 ⦆
+
+    speed' : Measure m/s
+    speed' = ⦅ 3 ⦆
+
+    time' : Measure s
+    time' = ⦅ 2 ⦆
+
+    time'' : Measure ms
+    time'' = ⦅ 2 ⦆
+
+    _ : Unit→Measure m ≡ + 1 /q 1
+    _ = refl
+
+    _ : std dist ≡ + 6 /q 1
+    _ = refl
+
+    _ : speed' ≡ speed dist time' ⦃ _ ⦄
+    _ = refl
+
+    _ : dist ≡ distanceF speed' time'
+    _ = refl
+```
+
+The biggest difference is now in multiplication.
+Because the equality of vectors is easy to verify,
+it is now possible to make tests with multiplication and division.
+The results are always normalized, so there is no kilometer and
+milliseconds after multiplication or division.
+
+```
+    _ : (2 ⋆⋆ m/s) *m (2 ⋆⋆ m/s)
+      ≡ (4 ⋆⋆ (m/s *u m/s))
+    _ = refl
+
+    _ : (2 ⋆⋆ km) *m (6 ⋆⋆ m/s)
+      ≡ (12000 ⋆⋆ (m *u m/s))
+    _ = refl
+
+    _ : ((10 ⋆⋆ m) /m (2 ⋆⋆ ms))
+      ≡ (5000 ⋆⋆ (m /u s))
     _ = refl
 ```
