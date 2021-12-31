@@ -796,7 +796,7 @@ milliseconds after multiplication or division.
       ≡ (12000 ⋆⋆ (m *u m/s))
     _ = refl
 
-    _ : ((10 ⋆⋆ m) /m (2 ⋆⋆ ms))
+    _ : (_/m_ (10 ⋆⋆ m) (2 ⋆⋆ ms) ⦃ _ ⦄)
       ≡ (5000 ⋆⋆ (m /u s))
     _ = refl
 ```
