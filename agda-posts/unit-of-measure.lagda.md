@@ -589,30 +589,6 @@ We have two dimensional. Distance is the first and time is the second.
   time = Fin.suc Fin.zero
 ```
 
-For each unit (m, km, s, ms), there is a dimensional associated with that.
-It is in the vector `UnitDimensional`.
-
-```
-  UnitDimensional : Vec (Fin DimensionalSize) UnitSize
-  UnitDimensional = distance ∷ distance ∷ time ∷ time ∷ []
-```
-
-Unit proportion is the same in the case above.
-But the difference is that it has to come with a proof that all elements
-are non-zero.
-
-```
-  UnitProportionNZ : Vec (Σ[ q ∈ ℚ ] ℚ.NonZero q) UnitSize
-  UnitProportionNZ = (1ℚ , _) ∷ (+ 1000 /q 1 , _)∷ ((1ℚ , _)) ∷ (+ 1 /q 1000 , _) ∷ []
-```
-
-Meters and seconds are unit standards of distance and time respectively.
-
-```
-  UnitStandard : Vec Bool UnitSize
-  UnitStandard = true ∷ false ∷ true ∷ false ∷ []
-```
-
 These are the units of meters, kilometers, seconds, and milliseconds.
 
 ```
@@ -629,6 +605,34 @@ These are the units of meters, kilometers, seconds, and milliseconds.
   ms^ z = + 0 ∷ + 0 ∷ + 0 ∷ z ∷ []
 ```
 
+For each unit (m, km, s, ms), there is a dimensional associated with that.
+It is in the vector `UnitDimensional`.
+
+```
+  UnitDimensional : Vec (Fin DimensionalSize) UnitSize
+  UnitDimensional = distance ∷ distance ∷ time ∷ time ∷ []
+```
+
+Meters and seconds are unit standards of distance and time respectively.
+
+```
+  UnitStandard : Vec Bool UnitSize
+  UnitStandard = true ∷ false ∷ true ∷ false ∷ []
+```
+
+## Unit Proportion
+
+Unit proportion is the same in the case above.
+But the difference is that it has to come with proof that all elements
+are non-zero.
+
+```
+  UnitProportionNZ : Vec (Σ[ q ∈ ℚ ] ℚ.NonZero q) UnitSize
+  UnitProportionNZ = (1ℚ , _) ∷ (+ 1000 /q 1 , _)∷ ((1ℚ , _)) ∷ (+ 1 /q 1000 , _) ∷ []
+```
+
+## Unit operations
+
 To multiplicate the unit, it is just necessary to add each element of both vectors,
 and to divide, it is necessary to subtract.
 
@@ -639,6 +643,8 @@ and to divide, it is necessary to subtract.
   _/u_ : Op₂ Unit
   _/u_ = zipWithV _-z_
 ```
+
+## Unit and dimensional conversion
 
 These functions are the same as in the case of the Dimensional Unit above.
 
@@ -661,6 +667,8 @@ These functions are the same as in the case of the Dimensional Unit above.
   Unit→Measure : Unit → ℚ
   Unit→Measure unit = prodℚv $ zipWithV (λ (q , nz) un → _**_ q un ⦃ nz ⦄) UnitProportionNZ unit
 ```
+
+## Examples
 
 These are some examples of the use of the functions above.
 
@@ -691,6 +699,8 @@ These are some examples of the use of the functions above.
     _ = refl
 ```
 
+## Measure definition
+
 The Measure definition is the same as the case above.
 
 ```
@@ -716,6 +726,8 @@ The `std` function got the measure in the standard unit (such as a meter or a se
     variable
       u u₁ u₂ : Unit
 ```
+
+## Measure operations
 
 The definition of multiplication, addition, and division is like the case above,
 except that they use the `std` function,
@@ -748,6 +760,8 @@ except that they use the `std` function,
                     → Measure m/s
   speed distance time = distance /m time
 ```
+
+## Examples
 
 Some examples using the code.
 
