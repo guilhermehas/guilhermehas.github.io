@@ -47,6 +47,7 @@ open import internal-library
 private
   variable
     ℓ ℓ′ : Level
+    n : ℕ
 
 ```
 
@@ -374,10 +375,10 @@ and milliseconds is 1/1000 of a second, so its value is 1/1000.
   UnitProportion ms = + 1 /q 1000
 ```
 
+## Unit and Dimensional Power
+
 Unit Power is the power of each unit.
 For example: `m^2 * km^(- 1) * s^5 * ms^0`.
-
-## Unit and Dimensional Power
 
 ```
   UnitPower = Unit → ℤ
@@ -627,8 +628,14 @@ But the difference is that it has to come with proof that all elements
 are non-zero.
 
 ```
-  UnitProportionNZ : Vec (Σ[ q ∈ ℚ ] ℚ.NonZero q) UnitSize
-  UnitProportionNZ = (1ℚ , _) ∷ (+ 1000 /q 1 , _)∷ ((1ℚ , _)) ∷ (+ 1 /q 1000 , _) ∷ []
+  ℚNZ = Σ[ q ∈ ℚ ] ℚ.NonZero q
+
+  UnitProportionNZ : Vec ℚNZ UnitSize
+  UnitProportionNZ = 1ℚ :: + 1000 /q 1 :: 1ℚ :: + 1 /q 1000 :: []
+    where
+      _::_ : (x : ℚ) (xs : Vec ℚNZ n) ⦃ _ : ℚ.NonZero x ⦄ → Vec ℚNZ (ℕ.suc n)
+      (x :: xs) ⦃ nz ⦄ = (x , nz) ∷ xs
+      infixr 5 _::_
 ```
 
 ## Unit operations
