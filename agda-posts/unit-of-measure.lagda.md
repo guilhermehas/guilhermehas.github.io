@@ -631,11 +631,7 @@ are non-zero.
   ℚNZ = Σ[ q ∈ ℚ ] ℚ.NonZero q
 
   UnitProportionNZ : Vec ℚNZ UnitSize
-  UnitProportionNZ = 1ℚ :: + 1000 /q 1 :: 1ℚ :: + 1 /q 1000 :: []
-    where
-      _::_ : (x : ℚ) (xs : Vec ℚNZ n) ⦃ _ : ℚ.NonZero x ⦄ → Vec ℚNZ (ℕ.suc n)
-      (x :: xs) ⦃ nz ⦄ = (x , nz) ∷ xs
-      infixr 5 _::_
+  UnitProportionNZ = (1ℚ , _) ∷ (+ 1000 /q 1 , _)∷ ((1ℚ , _)) ∷ (+ 1 /q 1000 , _) ∷ []
 ```
 
 ## Unit operations
