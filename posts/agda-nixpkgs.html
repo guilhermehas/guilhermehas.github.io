@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Guilherme Silva Blog - How an Agda package in Nixpkgs should be</title>
+        <link rel="stylesheet" href="../css/default.css" />
+        <link rel="stylesheet" href="Agda.css" />
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../">Guilherme Silva</a>
+            </div>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>How an Agda package in Nixpkgs should be</h1>
+            <article>
+    <section class="header">
+        Posted on March 18, 2022
+        
+            by Guilherme
+        
+    </section>
+    <section>
+        <h1 id="motivation">Motivation</h1>
+<p>Looking at how Agda was compiled in <a href="https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/build-support/agda/default.nix">Nixpkgs</a>, I saw that the code is with a lot of noise that obscures the important information. To solve this problem, I use the concepts of this <a href="https://youtu.be/vNwukfhsOME">YouTube video</a> to refactor my code trying to transform everything that is possible into data.</p>
+<h1 id="imports">Imports</h1>
+<p>Importing from <a href="https://github.com/agda/agda-stdlib">Agda standard library</a>.</p>
+<pre class="Agda"><a id="597" class="Keyword">open</a> <a id="602" class="Keyword">import</a> <a id="609" href="Data.Nat.html" class="Module">Data.Nat</a>
+<a id="618" class="Keyword">open</a> <a id="623" class="Keyword">import</a> <a id="630" href="Data.Bool.html" class="Module">Data.Bool</a>
+<a id="640" class="Keyword">open</a> <a id="645" class="Keyword">import</a> <a id="652" href="Data.String.html" class="Module">Data.String</a>
+<a id="664" class="Keyword">open</a> <a id="669" class="Keyword">import</a> <a id="676" href="Data.List.html" class="Module">Data.List</a>
+<a id="686" class="Keyword">open</a> <a id="691" class="Keyword">import</a> <a id="698" href="Function.html" class="Module">Function</a>
+</pre>
+<h1 id="defining-a-package">Defining a package</h1>
+<p>An executable file is a program that will run such as Agda, GHC, Idris… I will assume it is as a Set, but this definition can be improved later.</p>
+<pre class="Agda"><a id="886" class="Keyword">module</a> <a id="893" href="agda-nixpkgs.html" class="Module">agda-nixpkgs</a>
+  <a id="908" class="Symbol">(</a><a id="909" href="agda-nixpkgs.html#909" class="Bound">Executable</a> <a id="920" class="Symbol">:</a> <a id="922" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="925" class="Symbol">)</a>
+  <a id="929" class="Keyword">where</a>
+</pre>
+<p>A package in will be formed by a name, a version, a list of extensions (such as “.agda” for Agda files or “.doc” for Word files), a list of their developers, and an executable file.</p>
+<pre class="Agda"><a id="1128" class="Keyword">record</a> <a id="Package"></a><a id="1135" href="agda-nixpkgs.html#1135" class="Record">Package</a> <a id="1143" class="Symbol">:</a> <a id="1145" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="1149" class="Keyword">where</a>
+  <a id="1157" class="Keyword">field</a>
+    <a id="Package.name"></a><a id="1167" href="agda-nixpkgs.html#1167" class="Field">name</a> <a id="1172" class="Symbol">:</a> <a id="1174" href="Agda.Builtin.String.html#336" class="Postulate">String</a>
+    <a id="Package.version"></a><a id="1185" href="agda-nixpkgs.html#1185" class="Field">version</a> <a id="1193" class="Symbol">:</a> <a id="1195" href="Agda.Builtin.Nat.html#192" class="Datatype">ℕ</a>
+    <a id="Package.extensions"></a><a id="1201" href="agda-nixpkgs.html#1201" class="Field">extensions</a> <a id="1212" class="Symbol">:</a> <a id="1214" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="1219" href="Agda.Builtin.String.html#336" class="Postulate">String</a>
+    <a id="Package.developers"></a><a id="1230" href="agda-nixpkgs.html#1230" class="Field">developers</a> <a id="1241" class="Symbol">:</a> <a id="1243" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="1248" href="Agda.Builtin.String.html#336" class="Postulate">String</a>
+    <a id="Package.executable"></a><a id="1259" href="agda-nixpkgs.html#1259" class="Field">executable</a> <a id="1270" class="Symbol">:</a> <a id="1272" href="agda-nixpkgs.html#909" class="Bound">Executable</a>
+
+<a id="1284" class="Keyword">open</a> <a id="1289" href="agda-nixpkgs.html#1135" class="Module">Package</a>
+</pre>
+<h1 id="defining-an-agda-package">Defining an Agda Package</h1>
+<p>I will define GHC as a Set of GHC compilers, so each version of the GHC compiler belongs to this set. In addition, each Agda Library also belongs to the AgdaLibrary set.</p>
+<pre class="Agda"><a id="1505" class="Keyword">module</a> <a id="1512" href="agda-nixpkgs.html#1512" class="Module">_</a>
+  <a id="1516" class="Symbol">(</a><a id="1517" href="agda-nixpkgs.html#1517" class="Bound">GHC</a> <a id="1521" class="Symbol">:</a> <a id="1523" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="1526" class="Symbol">)</a>
+  <a id="1530" class="Symbol">(</a><a id="1531" href="agda-nixpkgs.html#1531" class="Bound">AgdaLibrary</a> <a id="1543" class="Symbol">:</a> <a id="1545" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="1548" class="Symbol">)</a>
+  <a id="1552" class="Keyword">where</a>
+</pre>
+<p>Instead of giving information in the command line of what the Agda command should be, it is better to have a record type of different options. This approach avoids error mistakes and make the code more restrict. The options will be the GHC compiler, the libraries that Agda will use, and if it will use or not the local interfaces option.</p>
+<pre class="Agda">  <a id="1909" class="Keyword">record</a> <a id="1916" href="agda-nixpkgs.html#1916" class="Record">AgdaOptions</a> <a id="1928" class="Symbol">:</a> <a id="1930" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="1934" class="Keyword">where</a>
+    <a id="1944" class="Keyword">field</a>
+      <a id="1956" href="agda-nixpkgs.html#1956" class="Field">ghc</a> <a id="1960" class="Symbol">:</a> <a id="1962" href="agda-nixpkgs.html#1517" class="Bound">GHC</a>
+      <a id="1972" href="agda-nixpkgs.html#1972" class="Field">libraries</a> <a id="1982" class="Symbol">:</a> <a id="1984" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="1989" href="agda-nixpkgs.html#1531" class="Bound">AgdaLibrary</a>
+      <a id="2007" href="agda-nixpkgs.html#2007" class="Field">localInterfaces</a> <a id="2023" class="Symbol">:</a> <a id="2025" href="Agda.Builtin.Bool.html#163" class="Datatype">Bool</a>
+
+  <a id="2033" class="Keyword">open</a> <a id="2038" href="agda-nixpkgs.html#1916" class="Module">AgdaOptions</a>
+</pre>
+<h2 id="example">Example</h2>
+<p>To make an example of the Agda package, it will be necessary to define an Agda Builder that generates an Agda executable from their options. In addition, I created a default GHC compiler and some Agda Libraries to use as examples.</p>
+<pre class="Agda">  <a id="2305" class="Keyword">module</a> <a id="2312" href="agda-nixpkgs.html#2312" class="Module">_</a>
+    <a id="2318" class="Symbol">(</a><a id="2319" href="agda-nixpkgs.html#2319" class="Bound">agdaBuilder</a> <a id="2331" class="Symbol">:</a> <a id="2333" href="agda-nixpkgs.html#1916" class="Record">AgdaOptions</a> <a id="2345" class="Symbol">→</a> <a id="2347" href="agda-nixpkgs.html#909" class="Bound">Executable</a><a id="2357" class="Symbol">)</a>
+    <a id="2363" class="Symbol">(</a><a id="2364" href="agda-nixpkgs.html#2364" class="Bound">defaultGHC</a> <a id="2375" class="Symbol">:</a> <a id="2377" href="agda-nixpkgs.html#1517" class="Bound">GHC</a><a id="2380" class="Symbol">)</a>
+    <a id="2386" class="Symbol">(</a><a id="2387" href="agda-nixpkgs.html#2387" class="Bound">cubical</a> <a id="2395" href="agda-nixpkgs.html#2395" class="Bound">agda-stdlib</a> <a id="2407" class="Symbol">:</a> <a id="2409" href="agda-nixpkgs.html#1531" class="Bound">AgdaLibrary</a><a id="2420" class="Symbol">)</a>
+    <a id="2426" class="Keyword">where</a>
+</pre>
+<p>The default option is with the default GHC compiler, with no libraries and without using the local interface option.</p>
+<pre class="Agda">    <a id="2563" href="agda-nixpkgs.html#2563" class="Function">defaultAgdaOptions</a> <a id="2582" class="Symbol">:</a> <a id="2584" href="agda-nixpkgs.html#1916" class="Record">AgdaOptions</a>
+    <a id="2600" href="agda-nixpkgs.html#1956" class="Field">ghc</a> <a id="2604" href="agda-nixpkgs.html#2563" class="Function">defaultAgdaOptions</a> <a id="2623" class="Symbol">=</a> <a id="2625" href="agda-nixpkgs.html#2364" class="Bound">defaultGHC</a>
+    <a id="2640" href="agda-nixpkgs.html#1972" class="Field">libraries</a> <a id="2650" href="agda-nixpkgs.html#2563" class="Function">defaultAgdaOptions</a> <a id="2669" class="Symbol">=</a> <a id="2671" href="Agda.Builtin.List.html#185" class="InductiveConstructor">[]</a>
+    <a id="2678" href="agda-nixpkgs.html#2007" class="Field">localInterfaces</a> <a id="2694" href="agda-nixpkgs.html#2563" class="Function">defaultAgdaOptions</a> <a id="2713" class="Symbol">=</a> <a id="2715" href="Agda.Builtin.Bool.html#182" class="InductiveConstructor">false</a>
+</pre>
+<p>I created this operator <code>^∙</code> to add new libraries in Agda Options.</p>
+<pre class="Agda">    <a id="2802" href="agda-nixpkgs.html#2802" class="Function Operator">_^∙_</a> <a id="2807" class="Symbol">:</a> <a id="2809" href="agda-nixpkgs.html#1916" class="Record">AgdaOptions</a> <a id="2821" class="Symbol">→</a> <a id="2823" href="agda-nixpkgs.html#1531" class="Bound">AgdaLibrary</a> <a id="2835" class="Symbol">→</a> <a id="2837" href="agda-nixpkgs.html#1916" class="Record">AgdaOptions</a>
+    <a id="2853" href="agda-nixpkgs.html#1956" class="Field">ghc</a> <a id="2857" class="Symbol">(</a><a id="2858" href="agda-nixpkgs.html#2858" class="Bound">opts</a> <a id="2863" href="agda-nixpkgs.html#2802" class="Function Operator">^∙</a> <a id="2866" href="agda-nixpkgs.html#2866" class="Bound">lbry</a><a id="2870" class="Symbol">)</a> <a id="2872" class="Symbol">=</a> <a id="2874" href="agda-nixpkgs.html#2858" class="Bound">opts</a> <a id="2879" class="Symbol">.</a><a id="2880" href="agda-nixpkgs.html#1956" class="Field">ghc</a>
+    <a id="2888" href="agda-nixpkgs.html#1972" class="Field">libraries</a> <a id="2898" class="Symbol">(</a><a id="2899" href="agda-nixpkgs.html#2899" class="Bound">opts</a> <a id="2904" href="agda-nixpkgs.html#2802" class="Function Operator">^∙</a> <a id="2907" href="agda-nixpkgs.html#2907" class="Bound">lbry</a><a id="2911" class="Symbol">)</a> <a id="2913" class="Symbol">=</a> <a id="2915" href="agda-nixpkgs.html#2907" class="Bound">lbry</a> <a id="2920" href="Agda.Builtin.List.html#200" class="InductiveConstructor Operator">∷</a> <a id="2922" href="agda-nixpkgs.html#2899" class="Bound">opts</a> <a id="2927" class="Symbol">.</a><a id="2928" href="agda-nixpkgs.html#1972" class="Field">libraries</a>
+    <a id="2942" href="agda-nixpkgs.html#2007" class="Field">localInterfaces</a> <a id="2958" class="Symbol">(</a><a id="2959" href="agda-nixpkgs.html#2959" class="Bound">opts</a> <a id="2964" href="agda-nixpkgs.html#2802" class="Function Operator">^∙</a> <a id="2967" href="agda-nixpkgs.html#2967" class="Bound">lbry</a><a id="2971" class="Symbol">)</a> <a id="2973" class="Symbol">=</a> <a id="2975" href="agda-nixpkgs.html#2959" class="Bound">opts</a> <a id="2980" class="Symbol">.</a><a id="2981" href="agda-nixpkgs.html#2007" class="Field">localInterfaces</a>
+
+    <a id="3002" class="Keyword">infixl</a> <a id="3009" class="Number">5</a> <a id="3011" href="agda-nixpkgs.html#2802" class="Function Operator">_^∙_</a>
+</pre>
+<p>Finally, the Agda Package with Cubical and Standard Libraries.</p>
+<pre class="Agda">    <a id="3093" href="agda-nixpkgs.html#3093" class="Function">agdaPackage</a> <a id="3105" class="Symbol">:</a> <a id="3107" href="agda-nixpkgs.html#1135" class="Record">Package</a>
+    <a id="3119" href="agda-nixpkgs.html#1167" class="Field">name</a> <a id="3124" href="agda-nixpkgs.html#3093" class="Function">agdaPackage</a> <a id="3136" class="Symbol">=</a> <a id="3138" class="String">&quot;agda&quot;</a>
+    <a id="3149" href="agda-nixpkgs.html#1185" class="Field">version</a> <a id="3157" href="agda-nixpkgs.html#3093" class="Function">agdaPackage</a> <a id="3169" class="Symbol">=</a> <a id="3171" class="Number">1</a>
+    <a id="3177" href="agda-nixpkgs.html#1201" class="Field">extensions</a> <a id="3188" href="agda-nixpkgs.html#3093" class="Function">agdaPackage</a> <a id="3200" class="Symbol">=</a> <a id="3202" class="String">&quot;agda&quot;</a> <a id="3209" href="Agda.Builtin.List.html#200" class="InductiveConstructor Operator">∷</a> <a id="3211" href="Data.List.Base.html#5025" class="Function Operator">[</a> <a id="3213" class="String">&quot;lagda&quot;</a> <a id="3221" href="Data.List.Base.html#5025" class="Function Operator">]</a>
+    <a id="3227" href="agda-nixpkgs.html#1230" class="Field">developers</a> <a id="3238" href="agda-nixpkgs.html#3093" class="Function">agdaPackage</a> <a id="3250" class="Symbol">=</a> <a id="3252" href="Data.List.Base.html#5025" class="Function Operator">[</a> <a id="3254" class="String">&quot;Ulf Norell&quot;</a> <a id="3267" href="Data.List.Base.html#5025" class="Function Operator">]</a>
+    <a id="3273" href="agda-nixpkgs.html#1259" class="Field">executable</a> <a id="3284" href="agda-nixpkgs.html#3093" class="Function">agdaPackage</a> <a id="3296" class="Symbol">=</a> <a id="3298" href="agda-nixpkgs.html#2319" class="Bound">agdaBuilder</a> <a id="3310" href="Function.Base.html#1919" class="Function Operator">$</a> <a id="3312" href="agda-nixpkgs.html#2563" class="Function">defaultAgdaOptions</a> <a id="3331" href="agda-nixpkgs.html#2802" class="Function Operator">^∙</a> <a id="3334" href="agda-nixpkgs.html#2387" class="Bound">cubical</a> <a id="3342" href="agda-nixpkgs.html#2802" class="Function Operator">^∙</a> <a id="3345" href="agda-nixpkgs.html#2395" class="Bound">agda-stdlib</a>
+</pre>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a style="color:yellow;" href="http://jaspervdj.be/hakyll">Hakyll</a> with
+            <a style="color:yellow;" href="https://github.com/guilhermehas/guilhermehas.github.io">source code</a>
+        </footer>
+    </body>
+</html>
