@@ -30,7 +30,10 @@
     </section>
     <section>
         <h1 id="motivation">Motivation</h1>
-<p>Containers are generic data structures that can represent most of the Agda data types. They enable one to prove properties of their data structure and also generate properties for them. With Agda reflection, it is possible to generate the container associated with the data structure and get the properties and associated structures for free (e.g. deriving a functor for the data types). <a href="https://github.com/effectfully/Generic">Agda Generic Library</a> does exactly that, it gets the data structure from reflection, transform it to containers, generate the equality for them and return the generated equality for the data structure.</p>
+<p>Containers are generic data structures that can represent most of the Agda data types.
+They enable one to prove properties of their data structure and also generate properties for them.
+With Agda reflection, it is possible to generate the container associated with the data structure and get the properties and associated structures for free (e.g. deriving a functor for the data types).
+<a href="https://github.com/effectfully/Generic">Agda Generic Library</a> does exactly that, it gets the data structure from reflection, transform it to containers, generate the equality for them and return the generated equality for the data structure.</p>
 <h1 id="imports">Imports</h1>
 <p>Importing agda standard library:</p>
 <pre class="Agda"><a id="772" class="Keyword">module</a> <a id="779" href="containers.html" class="Module">containers</a> <a id="790" class="Keyword">where</a>
@@ -56,7 +59,8 @@
   <a id="1342" href="containers.html#1342" class="Generalizable">A</a> <a id="1344" class="Symbol">:</a> <a id="1346" href="Agda.Primitive.html#326" class="Primitive">Set</a>
 </pre>
 <h1 id="definition">Definition</h1>
-<p>The container is a record with two fields: Shape and Position. The shape is its shape type and the position reference each shape for a type.</p>
+<p>The container is a record with two fields: Shape and Position.
+The shape is its shape type and the position reference each shape for a type.</p>
 <h2 id="two-container">Two Container</h2>
 <p>One of the simplest containers is a container with just two elements (the same as Bool).</p>
 <pre class="Agda"><a id="1623" class="Keyword">module</a> <a id="TwoContainer"></a><a id="1630" href="containers.html#1630" class="Module">TwoContainer</a> <a id="1643" class="Keyword">where</a>
@@ -83,7 +87,8 @@
 <p>To test them, I created a tuple that the first element is false and the second is true.</p>
 <pre class="Agda">  <a id="TwoContainer.myTuple"></a><a id="2280" href="containers.html#2280" class="Function">myTuple</a> <a id="2288" class="Symbol">=</a> <a id="2290" href="containers.html#1959" class="Function">mkTuple'</a> <a id="2299" href="Agda.Builtin.Bool.html#182" class="InductiveConstructor">false</a> <a id="2305" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a>
 </pre>
-<p>When containers really shine is when we get type classes and properties of them for free. All containers have a functor. So, I will invert the elements of that tuple with <code>map</code> that I got from its functor.</p>
+<p>When containers really shine is when we get type classes and properties of them for free.
+All containers have a functor. So, I will invert the elements of that tuple with <code>map</code> that I got from its functor.</p>
 <pre class="Agda">  <a id="TwoContainer.inverted"></a><a id="2528" href="containers.html#2528" class="Function">inverted</a> <a id="2537" class="Symbol">=</a> <a id="2539" href="Data.Container.Core.html#880" class="Function">map</a> <a id="2543" href="Data.Bool.Base.html#932" class="Function">not</a> <a id="2547" href="containers.html#2280" class="Function">myTuple</a>
 
   <a id="2558" href="containers.html#2558" class="Function">_</a> <a id="2560" class="Symbol">:</a> <a id="2562" href="containers.html#2084" class="Function">proj1</a> <a id="2568" href="containers.html#2528" class="Function">inverted</a> <a id="2577" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2579" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a>
@@ -121,7 +126,10 @@
   <a id="3256" class="Symbol">_</a> <a id="3258" class="Symbol">=</a> <a id="3260" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
 </pre>
 <h2 id="list-container">List Container</h2>
-<p>In the list container, the shape is the natural number. So each natural number corresponds to a list of its size. In the list, the position of each element is between 0 and its size. So the position is <code>Fin (length list)</code>.</p>
+<p>In the list container, the shape is the natural number.
+So each natural number corresponds to a list of its size.
+In the list, the position of each element is between 0 and its size.
+So the position is <code>Fin (length list)</code>.</p>
 <pre class="Agda"><a id="ListC"></a><a id="3517" href="containers.html#3517" class="Function">ListC</a> <a id="3523" class="Symbol">:</a> <a id="3525" href="Data.Container.Core.html#558" class="Record">Container</a> <a id="3535" href="containers.html#896" class="Primitive">lzero</a> <a id="3541" href="containers.html#896" class="Primitive">lzero</a>
 <a id="3547" href="containers.html#3517" class="Function">ListC</a> <a id="3553" class="Symbol">=</a> <a id="3555" href="Agda.Builtin.Nat.html#192" class="Datatype">ℕ</a> <a id="3557" href="Data.Container.Core.html#622" class="InductiveConstructor Operator">▷</a> <a id="3559" href="Data.Fin.Base.html#1126" class="Datatype">Fin</a>
 </pre>
@@ -157,7 +165,8 @@
 <a id="4273" class="Symbol">_</a> <a id="4275" class="Symbol">=</a> <a id="4277" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
 </pre>
 <h1 id="function-container">Function container</h1>
-<p>The function container is made using <code>const[_]⟶_</code> of the library that has this property: <code>⟦ const[ I ]⟶ id ⟧ X ↔︎ (I → ⟦ id ⟧ X) ↔︎ (I → F.id X) ↔︎ (I → X)</code>.</p>
+<p>The function container is made using <code>const[_]⟶_</code> of the library that has this property:
+<code>⟦ const[ I ]⟶ id ⟧ X ↔︎ (I → ⟦ id ⟧ X) ↔︎ (I → F.id X) ↔︎ (I → X)</code>.</p>
 <pre class="Agda"><a id="4470" class="Keyword">module</a> <a id="4477" href="containers.html#4477" class="Module">_</a> <a id="4479" class="Symbol">(</a><a id="4480" href="containers.html#4480" class="Bound">A</a> <a id="4482" class="Symbol">:</a> <a id="4484" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="4487" class="Symbol">)</a> <a id="4489" class="Keyword">where</a>
   <a id="4497" href="containers.html#4497" class="Function">ContainerF</a> <a id="4508" class="Symbol">:</a> <a id="4510" href="Data.Container.Core.html#558" class="Record">Container</a> <a id="4520" href="containers.html#896" class="Primitive">lzero</a> <a id="4526" href="containers.html#896" class="Primitive">lzero</a>
   <a id="4534" href="containers.html#4497" class="Function">ContainerF</a> <a id="4545" class="Symbol">=</a> <a id="4547" href="Data.Container.Combinator.html#1756" class="Function Operator">const[</a> <a id="4554" href="containers.html#4480" class="Bound">A</a> <a id="4556" href="Data.Container.Combinator.html#1756" class="Function Operator">]⟶</a> <a id="4559" href="Data.Container.Combinator.html#753" class="Function">id</a>

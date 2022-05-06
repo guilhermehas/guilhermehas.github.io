@@ -30,7 +30,8 @@
     </section>
     <section>
         <h1 id="motivation">Motivation</h1>
-<p>My motivation to formalize a concurrency programming language using small-step semantics is to use this concept for a no deterministic programming language.</p>
+<p>My motivation to formalize a concurrency programming language using small-step semantics
+is to use this concept for a no deterministic programming language.</p>
 <h1 id="imports">Imports</h1>
 <p>Importing from <a href="https://github.com/agda/agda-stdlib">Agda standard library</a>.</p>
 <pre class="Agda"><a id="364" class="Symbol">{-#</a> <a id="368" class="Keyword">OPTIONS</a> <a id="376" class="Pragma">--sized-types</a> <a id="390" class="Symbol">#-}</a>
@@ -45,7 +46,9 @@
 <a id="596" class="Keyword">open</a> <a id="601" class="Keyword">import</a> <a id="608" href="Codata.Stream.html" class="Module">Codata.Stream</a> <a id="622" class="Keyword">using</a> <a id="628" class="Symbol">(</a><a id="629" href="Codata.Stream.html#900" class="Datatype">Stream</a><a id="635" class="Symbol">;</a> <a id="637" href="Codata.Stream.html#946" class="InductiveConstructor Operator">_∷_</a><a id="640" class="Symbol">;</a> <a id="642" href="Codata.Stream.html#1083" class="Function">repeat</a><a id="648" class="Symbol">)</a>
 </pre>
 <h1 id="defining-the-language">Defining the language</h1>
-<p>The programming language is a simple command that can be a natural number, two concurrency programs, or two programs that happen one next to the other. In the end, the main idea is that this program just returns a list of natural numbers.</p>
+<p>The programming language is a simple command that can be a natural number,
+two concurrency programs, or two programs that happen one next to the other.
+In the end, the main idea is that this program just returns a list of natural numbers.</p>
 <pre class="Agda"><a id="924" class="Keyword">infixr</a> <a id="931" class="Number">6</a> <a id="933" href="concurrency-language.html#1001" class="InductiveConstructor Operator">_||_</a>
 <a id="938" class="Keyword">infixr</a> <a id="945" class="Number">7</a> <a id="947" href="concurrency-language.html#1038" class="InductiveConstructor Operator">_,,_</a>
 <a id="952" class="Keyword">data</a> <a id="Command"></a><a id="957" href="concurrency-language.html#957" class="Datatype">Command</a> <a id="965" class="Symbol">:</a> <a id="967" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="971" class="Keyword">where</a>
@@ -57,7 +60,8 @@
 <p>Now, it will be defined the small-step semantic of this programming language:</p>
 <pre class="Agda"><a id="NextCommand"></a><a id="1176" href="concurrency-language.html#1176" class="Function">NextCommand</a> <a id="1188" class="Symbol">=</a> <a id="1190" href="Agda.Builtin.Nat.html#192" class="Datatype">ℕ</a> <a id="1192" href="Data.Product.html#1167" class="Function Operator">×</a> <a id="1194" href="Agda.Builtin.Maybe.html#136" class="Datatype">Maybe</a> <a id="1200" href="concurrency-language.html#957" class="Datatype">Command</a>
 </pre>
-<p>The command will be reduced to a natural number that it produced or maybe a new command if there is still a new program to reduce.</p>
+<p>The command will be reduced to a natural number that it produced or
+maybe a new command if there is still a new program to reduce.</p>
 <pre class="Agda"><a id="1349" class="Keyword">variable</a>
   <a id="1360" href="concurrency-language.html#1360" class="Generalizable">x</a> <a id="1362" href="concurrency-language.html#1362" class="Generalizable">m</a> <a id="1364" href="concurrency-language.html#1364" class="Generalizable">n</a> <a id="1366" class="Symbol">:</a> <a id="1368" href="Agda.Builtin.Nat.html#192" class="Datatype">ℕ</a>
   <a id="1372" href="concurrency-language.html#1372" class="Generalizable">xs</a> <a id="1375" href="concurrency-language.html#1375" class="Generalizable">ys</a> <a id="1378" class="Symbol">:</a> <a id="1380" href="Agda.Builtin.List.html#148" class="Datatype">List</a> <a id="1385" href="Agda.Builtin.Nat.html#192" class="Datatype">ℕ</a>
@@ -67,7 +71,8 @@
 <a id="1426" class="Keyword">data</a> <a id="_—→_"></a><a id="1431" href="concurrency-language.html#1431" class="Datatype Operator">_—→_</a> <a id="1436" class="Symbol">:</a> <a id="1438" href="concurrency-language.html#957" class="Datatype">Command</a> <a id="1446" class="Symbol">→</a> <a id="1448" href="concurrency-language.html#1176" class="Function">NextCommand</a> <a id="1460" class="Symbol">→</a> <a id="1462" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="1466" class="Keyword">where</a>
   <a id="_—→_.ξℕ"></a><a id="1474" href="concurrency-language.html#1474" class="InductiveConstructor">ξℕ</a> <a id="1477" class="Symbol">:</a> <a id="1479" href="concurrency-language.html#979" class="InductiveConstructor">print</a> <a id="1485" href="concurrency-language.html#1364" class="Generalizable">n</a> <a id="1487" href="concurrency-language.html#1431" class="Datatype Operator">—→</a> <a id="1490" href="concurrency-language.html#1364" class="Generalizable">n</a> <a id="1492" href="Agda.Builtin.Sigma.html#236" class="InductiveConstructor Operator">,</a> <a id="1494" href="Agda.Builtin.Maybe.html#195" class="InductiveConstructor">nothing</a>
 </pre>
-<p>The simplest reduction is when there is a simple program with just a natural number. This program will be reduced to it and there is no program remaining.</p>
+<p>The simplest reduction is when there is a simple program with just a natural number.
+This program will be reduced to it and there is no program remaining.</p>
 <pre class="Agda">  <a id="_—→_.ξ||ₗ"></a><a id="1669" href="concurrency-language.html#1669" class="InductiveConstructor">ξ||ₗ</a> <a id="1674" class="Symbol">:</a> <a id="1676" href="concurrency-language.html#1391" class="Generalizable">M</a> <a id="1678" href="concurrency-language.html#1431" class="Datatype Operator">—→</a> <a id="1681" href="concurrency-language.html#1362" class="Generalizable">m</a> <a id="1683" href="Agda.Builtin.Sigma.html#236" class="InductiveConstructor Operator">,</a> <a id="1685" href="Agda.Builtin.Maybe.html#174" class="InductiveConstructor">just</a> <a id="1690" href="concurrency-language.html#1393" class="Generalizable">M'</a>
          <a id="1702" class="Comment">------------------------------</a>
          <a id="1742" class="Symbol">→</a> <a id="1744" href="concurrency-language.html#1391" class="Generalizable">M</a> <a id="1746" href="concurrency-language.html#1001" class="InductiveConstructor Operator">||</a> <a id="1749" href="concurrency-language.html#1396" class="Generalizable">N</a> <a id="1751" href="concurrency-language.html#1431" class="Datatype Operator">—→</a> <a id="1754" href="concurrency-language.html#1362" class="Generalizable">m</a> <a id="1756" href="Agda.Builtin.Sigma.html#236" class="InductiveConstructor Operator">,</a> <a id="1758" href="Agda.Builtin.Maybe.html#174" class="InductiveConstructor">just</a> <a id="1763" class="Symbol">(</a><a id="1764" href="concurrency-language.html#1393" class="Generalizable">M'</a> <a id="1767" href="concurrency-language.html#1001" class="InductiveConstructor Operator">||</a> <a id="1770" href="concurrency-language.html#1396" class="Generalizable">N</a><a id="1771" class="Symbol">)</a>
@@ -92,7 +97,8 @@
        <a id="2436" class="Comment">-----------------------------</a>
        <a id="2473" class="Symbol">→</a> <a id="2475" href="concurrency-language.html#1391" class="Generalizable">M</a> <a id="2477" href="concurrency-language.html#1038" class="InductiveConstructor Operator">,,</a> <a id="2480" href="concurrency-language.html#1396" class="Generalizable">N</a> <a id="2482" href="concurrency-language.html#1431" class="Datatype Operator">—→</a> <a id="2485" href="concurrency-language.html#1362" class="Generalizable">m</a> <a id="2487" href="Agda.Builtin.Sigma.html#236" class="InductiveConstructor Operator">,</a> <a id="2489" href="Agda.Builtin.Maybe.html#174" class="InductiveConstructor">just</a> <a id="2494" class="Symbol">(</a><a id="2495" href="concurrency-language.html#1393" class="Generalizable">M'</a> <a id="2498" href="concurrency-language.html#1038" class="InductiveConstructor Operator">,,</a> <a id="2501" href="concurrency-language.html#1396" class="Generalizable">N</a><a id="2502" class="Symbol">)</a>
 </pre>
-<p>When there is a sequence program, the left part is reduced once and the rest of the command is just the join of both of these programs.</p>
+<p>When there is a sequence program, the left part is reduced once and the rest of the command
+is just the join of both of these programs.</p>
 <pre class="Agda">  <a id="_—→_.ξ,,∅"></a><a id="2652" href="concurrency-language.html#2652" class="InductiveConstructor">ξ,,∅</a> <a id="2657" class="Symbol">:</a> <a id="2659" href="concurrency-language.html#1391" class="Generalizable">M</a> <a id="2661" href="concurrency-language.html#1431" class="Datatype Operator">—→</a> <a id="2664" href="concurrency-language.html#1362" class="Generalizable">m</a> <a id="2666" href="Agda.Builtin.Sigma.html#236" class="InductiveConstructor Operator">,</a> <a id="2668" href="Agda.Builtin.Maybe.html#195" class="InductiveConstructor">nothing</a>
        <a id="2683" class="Comment">----------------------</a>
        <a id="2713" class="Symbol">→</a> <a id="2715" href="concurrency-language.html#1391" class="Generalizable">M</a> <a id="2717" href="concurrency-language.html#1038" class="InductiveConstructor Operator">,,</a> <a id="2720" href="concurrency-language.html#1396" class="Generalizable">N</a> <a id="2722" href="concurrency-language.html#1431" class="Datatype Operator">—→</a> <a id="2725" href="concurrency-language.html#1362" class="Generalizable">m</a> <a id="2727" href="Agda.Builtin.Sigma.html#236" class="InductiveConstructor Operator">,</a> <a id="2729" href="Agda.Builtin.Maybe.html#174" class="InductiveConstructor">just</a> <a id="2734" href="concurrency-language.html#1396" class="Generalizable">N</a>
@@ -108,7 +114,10 @@
 <a id="2990" class="Symbol">_</a> <a id="2992" class="Symbol">=</a> <a id="2994" href="concurrency-language.html#2236" class="InductiveConstructor">ξ||∅ᵣ</a> <a id="3000" href="concurrency-language.html#1474" class="InductiveConstructor">ξℕ</a>
 </pre>
 <h1 id="multi-step">Multi-step</h1>
-<p>Now, it will be defined the multi-step of the language. It can be a zero-step, so a command <code>M</code> can go to <code>M</code> (<code>M —↠ M</code>), it can be multiple steps (that can be one, two, or any natural number) or it can be a step that the command finishes.</p>
+<p>Now, it will be defined the multi-step of the language.
+It can be a zero-step, so a command <code>M</code> can go to <code>M</code> (<code>M —↠ M</code>),
+it can be multiple steps (that can be one, two, or any natural number)
+or it can be a step that the command finishes.</p>
 <pre class="Agda"><a id="3267" class="Keyword">infix</a>  <a id="3274" class="Number">2</a> <a id="3276" href="concurrency-language.html#3332" class="Datatype Operator">_—↠_</a>
 <a id="3281" class="Keyword">infix</a>  <a id="3288" class="Number">1</a> <a id="3290" href="concurrency-language.html#3641" class="Function Operator">begin_</a>
 <a id="3297" class="Keyword">infixr</a> <a id="3304" class="Number">2</a> <a id="3306" href="concurrency-language.html#3445" class="InductiveConstructor Operator">_—→⟨_⟩_</a>
@@ -158,7 +167,10 @@
       <a id="4331" class="Comment">----------</a>
     <a id="4346" class="Symbol">→</a> <a id="4348" href="concurrency-language.html#4252" class="Datatype">SingleStep</a> <a id="4359" href="concurrency-language.html#1389" class="Generalizable">L</a>
 </pre>
-<p>With the eval step, I prove that every command has a single step associated with that. If the program is parallel, it will consume a boolean from the stream and this boolean represents which part of the program will be evaluated. The false represents the left part while true represents the right.</p>
+<p>With the eval step, I prove that every command has a single step associated with that.
+If the program is parallel, it will consume a boolean from the stream and
+this boolean represents which part of the program will be evaluated.
+The false represents the left part while true represents the right.</p>
 <pre class="Agda"><a id="eval-step"></a><a id="4669" href="concurrency-language.html#4669" class="Function">eval-step</a> <a id="4679" class="Symbol">:</a>
   <a id="4683" href="Codata.Stream.html#900" class="Datatype">Stream</a> <a id="4690" href="Agda.Builtin.Bool.html#163" class="Datatype">Bool</a> <a id="4695" class="Symbol">_</a>
   <a id="4699" class="Symbol">→</a> <a id="4701" class="Symbol">(</a><a id="4702" href="concurrency-language.html#4702" class="Bound">L</a> <a id="4704" class="Symbol">:</a> <a id="4706" href="concurrency-language.html#957" class="Datatype">Command</a><a id="4713" class="Symbol">)</a>
@@ -175,7 +187,8 @@
 <a id="5397" class="Symbol">...</a> <a id="5401" class="Symbol">|</a> <a id="5403" href="concurrency-language.html#5403" class="Bound">sys</a> <a id="5407" href="Agda.Builtin.Sigma.html#236" class="InductiveConstructor Operator">,</a> <a id="5409" href="concurrency-language.html#4287" class="InductiveConstructor">singleStep</a> <a id="5420" href="concurrency-language.html#5420" class="Bound">n</a> <a id="5422" href="Agda.Builtin.Maybe.html#195" class="InductiveConstructor">nothing</a> <a id="5430" href="concurrency-language.html#5430" class="Bound">st</a> <a id="5433" class="Symbol">=</a> <a id="5435" href="concurrency-language.html#5403" class="Bound">sys</a> <a id="5439" href="Agda.Builtin.Sigma.html#236" class="InductiveConstructor Operator">,</a> <a id="5441" class="Symbol">(</a><a id="5442" href="concurrency-language.html#4287" class="InductiveConstructor">singleStep</a> <a id="5453" href="concurrency-language.html#5420" class="Bound">n</a> <a id="5455" class="Symbol">(</a><a id="5456" href="Agda.Builtin.Maybe.html#174" class="InductiveConstructor">just</a> <a id="5461" class="Bound">M</a><a id="5462" class="Symbol">)</a> <a id="5464" class="Symbol">(</a><a id="5465" href="concurrency-language.html#2236" class="InductiveConstructor">ξ||∅ᵣ</a> <a id="5471" href="concurrency-language.html#5430" class="Bound">st</a><a id="5473" class="Symbol">))</a>
 </pre>
 <h1 id="evaluation">Evaluation</h1>
-<p>For the definition of evaluation, it will necessary to be defined when an command was finished in the evaluation and the steps of the evaluation.</p>
+<p>For the definition of evaluation, it will necessary to be defined when an
+command was finished in the evaluation and the steps of the evaluation.</p>
 <pre class="Agda"><a id="5646" class="Keyword">data</a> <a id="Steps"></a><a id="5651" href="concurrency-language.html#5651" class="Datatype">Steps</a> <a id="5657" class="Symbol">:</a> <a id="5659" href="concurrency-language.html#957" class="Datatype">Command</a> <a id="5667" class="Symbol">→</a> <a id="5669" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="5673" class="Keyword">where</a>
   <a id="Steps.steps"></a><a id="5681" href="concurrency-language.html#5681" class="InductiveConstructor">steps</a> <a id="5687" class="Symbol">:</a> <a id="5689" class="Symbol">∀</a> <a id="5691" href="concurrency-language.html#5691" class="Bound">xs</a>
     <a id="5698" class="Symbol">→</a> <a id="5700" href="concurrency-language.html#1389" class="Generalizable">L</a> <a id="5702" href="concurrency-language.html#3782" class="Function Operator">—⇀</a> <a id="5705" href="concurrency-language.html#5691" class="Bound">xs</a>
@@ -192,8 +205,13 @@
        <a id="5865" class="Comment">----------</a>
        <a id="5883" href="concurrency-language.html#5745" class="Datatype">Finished</a> <a id="5892" href="concurrency-language.html#5755" class="Bound">N</a>
 </pre>
-<p>A command is finished when it is a value or when there is no more gas available to calculate it. In Agda, every computation must terminate. So it is impossible to have an infinite loop. So when a command takes so much time to finish, it runs out of gas and there is no result.</p>
-<p>The evaluation finishes when there is proof of multi-step for the value and it is already finished.</p>
+<p>A command is finished when it is a value or when there is no more gas
+available to calculate it.
+In Agda, every computation must terminate. So it is impossible to have
+an infinite loop. So when a command takes so much time
+to finish, it runs out of gas and there is no result.</p>
+<p>The evaluation finishes when there is proof of multi-step for the value
+and it is already finished.</p>
 <pre class="Agda"><a id="eval"></a><a id="6282" href="concurrency-language.html#6282" class="Function">eval</a> <a id="6287" class="Symbol">:</a>
   <a id="6291" href="Agda.Builtin.Nat.html#192" class="Datatype">ℕ</a>
   <a id="6295" class="Symbol">→</a> <a id="6297" href="Codata.Stream.html#900" class="Datatype">Stream</a> <a id="6304" href="Agda.Builtin.Bool.html#163" class="Datatype">Bool</a> <a id="6309" class="Symbol">_</a>
@@ -206,7 +224,9 @@
 <a id="6538" class="Symbol">...</a>   <a id="6544" class="Symbol">|</a> <a id="6546" href="concurrency-language.html#5845" class="InductiveConstructor">out-of-gas</a> <a id="6557" class="Symbol">=</a> <a id="6559" href="concurrency-language.html#5845" class="InductiveConstructor">out-of-gas</a>
 <a id="6570" class="Symbol">...</a>   <a id="6576" class="Symbol">|</a> <a id="6578" href="concurrency-language.html#5783" class="InductiveConstructor">done</a> <a id="6583" class="Symbol">(</a><a id="6584" href="concurrency-language.html#5681" class="InductiveConstructor">steps</a> <a id="6590" href="concurrency-language.html#6590" class="Bound">xs</a> <a id="6593" href="concurrency-language.html#6593" class="Bound">st2</a><a id="6596" class="Symbol">)</a> <a id="6598" class="Symbol">=</a> <a id="6600" href="concurrency-language.html#5783" class="InductiveConstructor">done</a> <a id="6605" class="Symbol">(</a><a id="6606" href="concurrency-language.html#5681" class="InductiveConstructor">steps</a> <a id="6612" class="Symbol">(</a><a id="6613" class="Bound">n</a> <a id="6615" href="Agda.Builtin.List.html#200" class="InductiveConstructor Operator">∷</a> <a id="6617" href="concurrency-language.html#6590" class="Bound">xs</a><a id="6619" class="Symbol">)</a> <a id="6621" class="Symbol">(</a><a id="6622" class="Bound">L</a> <a id="6624" href="concurrency-language.html#3445" class="InductiveConstructor Operator">—→⟨</a> <a id="6628" class="Bound">st</a> <a id="6631" href="concurrency-language.html#3445" class="InductiveConstructor Operator">⟩</a> <a id="6633" href="concurrency-language.html#6593" class="Bound">st2</a><a id="6636" class="Symbol">))</a>
 </pre>
-<p>The evaluation takes gas and the command to evaluate. In the end, it returns the value with proof that the command evaluates this value.</p>
+<p>The evaluation takes gas and the command to evaluate.
+In the end, it returns the value with proof that the command evaluates
+this value.</p>
 <p>Here, some examples of the evaluation:</p>
 <pre class="Agda"><a id="rfalse"></a><a id="6826" href="concurrency-language.html#6826" class="Function">rfalse</a> <a id="6833" class="Symbol">=</a> <a id="6835" href="Codata.Stream.html#1083" class="Function">repeat</a> <a id="6842" href="Agda.Builtin.Bool.html#182" class="InductiveConstructor">false</a>
 <a id="rtrue"></a><a id="6848" href="concurrency-language.html#6848" class="Function">rtrue</a> <a id="6854" class="Symbol">=</a> <a id="6856" href="Codata.Stream.html#1083" class="Function">repeat</a> <a id="6863" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a>

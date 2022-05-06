@@ -30,7 +30,12 @@
     </section>
     <section>
         <h1 id="motivation">Motivation</h1>
-<p>Looking at how Agda was compiled in <a href="https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/build-support/agda/default.nix">Nixpkgs</a>, I saw that the code is with a lot of noise that obscures the important information. To solve this problem, I use the concepts of this <a href="https://youtu.be/vNwukfhsOME">YouTube video</a> to refactor my code trying to transform everything that is possible into data.</p>
+<p>Looking at how Agda was compiled in
+<a href="https://github.com/NixOS/nixpkgs/blob/nixos-unstable/pkgs/build-support/agda/default.nix">Nixpkgs</a>,
+I saw that the code is with a lot of noise that obscures the important information.
+To solve this problem, I use the concepts of this
+<a href="https://youtu.be/vNwukfhsOME">YouTube video</a>
+to refactor my code trying to transform everything that is possible into data.</p>
 <h1 id="imports">Imports</h1>
 <p>Importing from <a href="https://github.com/agda/agda-stdlib">Agda standard library</a>.</p>
 <pre class="Agda"><a id="597" class="Keyword">open</a> <a id="602" class="Keyword">import</a> <a id="609" href="Data.Nat.html" class="Module">Data.Nat</a>
@@ -40,12 +45,14 @@
 <a id="686" class="Keyword">open</a> <a id="691" class="Keyword">import</a> <a id="698" href="Function.html" class="Module">Function</a>
 </pre>
 <h1 id="defining-a-package">Defining a package</h1>
-<p>An executable file is a program that will run such as Agda, GHC, Idris… I will assume it is as a Set, but this definition can be improved later.</p>
+<p>An executable file is a program that will run such as Agda, GHC, Idris…
+I will assume it is as a Set, but this definition can be improved later.</p>
 <pre class="Agda"><a id="886" class="Keyword">module</a> <a id="893" href="agda-nixpkgs.html" class="Module">agda-nixpkgs</a>
   <a id="908" class="Symbol">(</a><a id="909" href="agda-nixpkgs.html#909" class="Bound">Executable</a> <a id="920" class="Symbol">:</a> <a id="922" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="925" class="Symbol">)</a>
   <a id="929" class="Keyword">where</a>
 </pre>
-<p>A package in will be formed by a name, a version, a list of extensions (such as “.agda” for Agda files or “.doc” for Word files), a list of their developers, and an executable file.</p>
+<p>A package in will be formed by a name, a version, a list of extensions
+(such as “.agda” for Agda files or “.doc” for Word files), a list of their developers, and an executable file.</p>
 <pre class="Agda"><a id="1128" class="Keyword">record</a> <a id="Package"></a><a id="1135" href="agda-nixpkgs.html#1135" class="Record">Package</a> <a id="1143" class="Symbol">:</a> <a id="1145" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="1149" class="Keyword">where</a>
   <a id="1157" class="Keyword">field</a>
     <a id="Package.name"></a><a id="1167" href="agda-nixpkgs.html#1167" class="Field">name</a> <a id="1172" class="Symbol">:</a> <a id="1174" href="Agda.Builtin.String.html#336" class="Postulate">String</a>
@@ -57,13 +64,18 @@
 <a id="1284" class="Keyword">open</a> <a id="1289" href="agda-nixpkgs.html#1135" class="Module">Package</a>
 </pre>
 <h1 id="defining-an-agda-package">Defining an Agda Package</h1>
-<p>I will define GHC as a Set of GHC compilers, so each version of the GHC compiler belongs to this set. In addition, each Agda Library also belongs to the AgdaLibrary set.</p>
+<p>I will define GHC as a Set of GHC compilers, so each version of the GHC compiler belongs to this set.
+In addition, each Agda Library also belongs to the AgdaLibrary set.</p>
 <pre class="Agda"><a id="1505" class="Keyword">module</a> <a id="1512" href="agda-nixpkgs.html#1512" class="Module">_</a>
   <a id="1516" class="Symbol">(</a><a id="1517" href="agda-nixpkgs.html#1517" class="Bound">GHC</a> <a id="1521" class="Symbol">:</a> <a id="1523" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="1526" class="Symbol">)</a>
   <a id="1530" class="Symbol">(</a><a id="1531" href="agda-nixpkgs.html#1531" class="Bound">AgdaLibrary</a> <a id="1543" class="Symbol">:</a> <a id="1545" href="Agda.Primitive.html#326" class="Primitive">Set</a><a id="1548" class="Symbol">)</a>
   <a id="1552" class="Keyword">where</a>
 </pre>
-<p>Instead of giving information in the command line of what the Agda command should be, it is better to have a record type of different options. This approach avoids error mistakes and make the code more restrict. The options will be the GHC compiler, the libraries that Agda will use, and if it will use or not the local interfaces option.</p>
+<p>Instead of giving information in the command line of what the Agda command should be,
+it is better to have a record type of different options.
+This approach avoids error mistakes and make the code more restrict.
+The options will be the GHC compiler, the libraries that Agda will use,
+and if it will use or not the local interfaces option.</p>
 <pre class="Agda">  <a id="1909" class="Keyword">record</a> <a id="1916" href="agda-nixpkgs.html#1916" class="Record">AgdaOptions</a> <a id="1928" class="Symbol">:</a> <a id="1930" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="1934" class="Keyword">where</a>
     <a id="1944" class="Keyword">field</a>
       <a id="1956" href="agda-nixpkgs.html#1956" class="Field">ghc</a> <a id="1960" class="Symbol">:</a> <a id="1962" href="agda-nixpkgs.html#1517" class="Bound">GHC</a>
@@ -73,7 +85,9 @@
   <a id="2033" class="Keyword">open</a> <a id="2038" href="agda-nixpkgs.html#1916" class="Module">AgdaOptions</a>
 </pre>
 <h2 id="example">Example</h2>
-<p>To make an example of the Agda package, it will be necessary to define an Agda Builder that generates an Agda executable from their options. In addition, I created a default GHC compiler and some Agda Libraries to use as examples.</p>
+<p>To make an example of the Agda package, it will be necessary to define an Agda Builder
+that generates an Agda executable from their options.
+In addition, I created a default GHC compiler and some Agda Libraries to use as examples.</p>
 <pre class="Agda">  <a id="2305" class="Keyword">module</a> <a id="2312" href="agda-nixpkgs.html#2312" class="Module">_</a>
     <a id="2318" class="Symbol">(</a><a id="2319" href="agda-nixpkgs.html#2319" class="Bound">agdaBuilder</a> <a id="2331" class="Symbol">:</a> <a id="2333" href="agda-nixpkgs.html#1916" class="Record">AgdaOptions</a> <a id="2345" class="Symbol">→</a> <a id="2347" href="agda-nixpkgs.html#909" class="Bound">Executable</a><a id="2357" class="Symbol">)</a>
     <a id="2363" class="Symbol">(</a><a id="2364" href="agda-nixpkgs.html#2364" class="Bound">defaultGHC</a> <a id="2375" class="Symbol">:</a> <a id="2377" href="agda-nixpkgs.html#1517" class="Bound">GHC</a><a id="2380" class="Symbol">)</a>
