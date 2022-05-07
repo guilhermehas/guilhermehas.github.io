@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Guilherme Silva Blog - Using pattern-match in your favor</title>
+        <link rel="stylesheet" href="../css/default.css" />
+        <link rel="stylesheet" href="Agda.css" />
+    </head>
+    <body>
+        <header>
+            <div class="logo">
+                <a href="../">Guilherme Silva</a>
+            </div>
+            <nav>
+                <a href="../">Home</a>
+                <a href="../archive.html">Archive</a>
+            </nav>
+        </header>
+
+        <main role="main">
+            <h1>Using pattern-match in your favor</h1>
+            <article>
+    <section class="header">
+        Posted on June  6, 2022
+        
+            by Guilherme
+        
+    </section>
+    <section>
+        <h1 id="motivation">Motivation</h1>
+<p>When I was proving a theorem of multiplication of two national numbers in Cubical Agda,
+I had to pattern-match integers in 3 cases (positive, negative, and zero).
+However, I would like to pattern match them in just two cases: zero or not zero.
+For that, it is necessary to create a record with that information and I will show it below.</p>
+<h1 id="imports">Imports</h1>
+<p>Importing from <a href="https://github.com/agda/agda-stdlib">Agda standard library</a>.</p>
+<pre class="Agda"><a id="531" class="Keyword">open</a> <a id="536" class="Keyword">import</a> <a id="543" href="Function.html" class="Module">Function</a>
+<a id="552" class="Keyword">open</a> <a id="557" class="Keyword">import</a> <a id="564" href="Data.Unit.html" class="Module">Data.Unit</a> <a id="574" class="Keyword">hiding</a> <a id="581" class="Symbol">(</a><a id="582" href="Data.Unit.Properties.html#837" class="Function Operator">_≟_</a><a id="585" class="Symbol">)</a>
+<a id="587" class="Keyword">open</a> <a id="592" class="Keyword">import</a> <a id="599" href="Data.Empty.html" class="Module">Data.Empty</a>
+<a id="610" class="Keyword">open</a> <a id="615" class="Keyword">import</a> <a id="622" href="Data.Bool.html" class="Module">Data.Bool</a> <a id="632" class="Keyword">hiding</a> <a id="639" class="Symbol">(</a><a id="640" href="Data.Bool.Properties.html#1126" class="Function Operator">_≟_</a><a id="643" class="Symbol">)</a>
+<a id="645" class="Keyword">open</a> <a id="650" class="Keyword">import</a> <a id="657" href="Data.Nat.html" class="Module">Data.Nat</a>
+  <a id="668" class="Keyword">using</a> <a id="674" class="Symbol">(</a><a id="675" href="Agda.Builtin.Nat.html#210" class="InductiveConstructor">zero</a><a id="679" class="Symbol">;</a> <a id="681" href="Agda.Builtin.Nat.html#223" class="InductiveConstructor">suc</a><a id="684" class="Symbol">)</a>
+<a id="686" class="Keyword">open</a> <a id="691" class="Keyword">import</a> <a id="698" href="Data.Integer.html" class="Module">Data.Integer</a> <a id="711" class="Keyword">renaming</a> <a id="720" class="Symbol">(</a><a id="721" href="Data.Integer.Base.html#2963" class="Function">NonZero</a> <a id="729" class="Symbol">to</a> <a id="732" class="Function">NonZeroℤ</a><a id="740" class="Symbol">)</a>
+<a id="742" class="Keyword">open</a> <a id="747" class="Keyword">import</a> <a id="754" href="Data.Integer.Properties.html" class="Module">Data.Integer.Properties</a>
+<a id="778" class="Keyword">open</a> <a id="783" class="Keyword">import</a> <a id="790" href="Relation.Nullary.html" class="Module">Relation.Nullary</a>
+<a id="807" class="Keyword">open</a> <a id="812" class="Keyword">import</a> <a id="819" href="Relation.Binary.PropositionalEquality.html" class="Module">Relation.Binary.PropositionalEquality</a>
+</pre>
+<h1 id="creating-patterns">Creating patterns</h1>
+<p>It is good to create some patterns to avoid unnecessary repetitions.</p>
+<pre class="Agda"><a id="957" class="Keyword">pattern</a> <a id="+z"></a><a id="965" href="IntegerProductNotZero.html#965" class="InductiveConstructor">+z</a> <a id="968" class="Symbol">=</a> <a id="970" href="Data.Integer.Base.html#1467" class="InductiveConstructor Operator">+[1+</a> <a id="975" class="Symbol">_</a> <a id="977" href="Data.Integer.Base.html#1467" class="InductiveConstructor Operator">]</a>
+<a id="979" class="Keyword">pattern</a> <a id="-z"></a><a id="987" href="IntegerProductNotZero.html#987" class="InductiveConstructor">-z</a> <a id="990" class="Symbol">=</a> <a id="992" href="Agda.Builtin.Int.html#291" class="InductiveConstructor Operator">-[1+</a> <a id="997" class="Symbol">_</a> <a id="999" href="Agda.Builtin.Int.html#291" class="InductiveConstructor Operator">]</a>
+</pre>
+<h1 id="non-zero-definition">Non zero definition</h1>
+<p>Because of the way that integers are defined in the library,
+it is necessary to break it into 3 cases to figure out if it is zero or not.</p>
+<pre class="Agda"><a id="NonZero?"></a><a id="1172" href="IntegerProductNotZero.html#1172" class="Function">NonZero?</a> <a id="1181" class="Symbol">:</a> <a id="1183" href="Agda.Builtin.Int.html#246" class="Datatype">ℤ</a> <a id="1185" class="Symbol">→</a> <a id="1187" href="Agda.Builtin.Bool.html#163" class="Datatype">Bool</a>
+<a id="1192" href="IntegerProductNotZero.html#1172" class="Function">NonZero?</a> <a id="1201" href="Data.Integer.Base.html#1444" class="InductiveConstructor">+0</a> <a id="1204" class="Symbol">=</a> <a id="1206" href="Agda.Builtin.Bool.html#182" class="InductiveConstructor">false</a>
+<a id="1212" href="IntegerProductNotZero.html#1172" class="Function">NonZero?</a> <a id="1221" href="IntegerProductNotZero.html#965" class="InductiveConstructor">+z</a> <a id="1224" class="Symbol">=</a> <a id="1226" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a>
+<a id="1231" href="IntegerProductNotZero.html#1172" class="Function">NonZero?</a> <a id="1240" href="IntegerProductNotZero.html#987" class="InductiveConstructor">-z</a> <a id="1243" class="Symbol">=</a> <a id="1245" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a>
+</pre>
+<h1 id="record-integer">Record Integer</h1>
+<p>To be possible to pattern match integer in two cases,
+it is necessary to add a boolean that represents if the integer is zero or not.
+With that boolean, it is necessary a proof that this boolean is true and false when
+the integer is not zero or zero respectively.</p>
+<pre class="Agda"><a id="1542" class="Keyword">infix</a> <a id="1548" class="Number">6</a> <a id="1550" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">_⟦_⟧⟦_⟧</a>
+
+<a id="1559" class="Keyword">record</a> <a id="Int"></a><a id="1566" href="IntegerProductNotZero.html#1566" class="Record">Int</a> <a id="1570" class="Symbol">:</a> <a id="1572" href="Agda.Primitive.html#326" class="Primitive">Set</a> <a id="1576" class="Keyword">where</a>
+  <a id="1584" class="Keyword">constructor</a> <a id="_⟦_⟧⟦_⟧"></a><a id="1596" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">_⟦_⟧⟦_⟧</a>
+  <a id="1606" class="Keyword">field</a>
+    <a id="Int.int"></a><a id="1616" href="IntegerProductNotZero.html#1616" class="Field">int</a> <a id="1620" class="Symbol">:</a> <a id="1622" href="Agda.Builtin.Int.html#246" class="Datatype">ℤ</a>
+    <a id="Int.nonZero?"></a><a id="1628" href="IntegerProductNotZero.html#1628" class="Field">nonZero?</a> <a id="1637" class="Symbol">:</a> <a id="1639" href="Agda.Builtin.Bool.html#163" class="Datatype">Bool</a>
+    <a id="Int.nonZero?-≡"></a><a id="1648" href="IntegerProductNotZero.html#1648" class="Field">nonZero?-≡</a> <a id="1659" class="Symbol">:</a> <a id="1661" href="IntegerProductNotZero.html#1172" class="Function">NonZero?</a> <a id="1670" href="IntegerProductNotZero.html#1616" class="Field">int</a> <a id="1674" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="1676" href="IntegerProductNotZero.html#1628" class="Field">nonZero?</a>
+
+  <a id="Int.NonZero"></a><a id="1688" href="IntegerProductNotZero.html#1688" class="Function">NonZero</a> <a id="1696" class="Symbol">:</a> <a id="1698" href="Agda.Primitive.html#326" class="Primitive">Set</a>
+  <a id="1704" href="IntegerProductNotZero.html#1688" class="Function">NonZero</a> <a id="1712" class="Symbol">=</a> <a id="1714" href="Data.Bool.Base.html#1451" class="Function">T</a> <a id="1716" href="IntegerProductNotZero.html#1628" class="Field">nonZero?</a>
+
+<a id="1726" class="Keyword">open</a> <a id="1731" href="IntegerProductNotZero.html#1566" class="Module">Int</a>
+</pre>
+<h1 id="integer-patterns">Integer patterns</h1>
+<p>These patterns (<code>≡0</code> and <code>≢0</code>) have just the information if the integer is zero or not.</p>
+<pre class="Agda"><a id="1853" class="Keyword">pattern</a> <a id="intnz"></a><a id="1861" href="IntegerProductNotZero.html#1861" class="InductiveConstructor">intnz</a> <a id="1867" href="IntegerProductNotZero.html#1881" class="Bound">x</a> <a id="1869" class="Symbol">=</a> <a id="1871" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">_⟦_⟧⟦_⟧</a> <a id="1879" class="Symbol">_</a> <a id="1881" href="IntegerProductNotZero.html#1881" class="Bound">x</a> <a id="1883" class="Symbol">_</a>
+<a id="1885" class="Keyword">pattern</a> <a id="≡0"></a><a id="1893" href="IntegerProductNotZero.html#1893" class="InductiveConstructor">≡0</a> <a id="1896" class="Symbol">=</a> <a id="1898" href="IntegerProductNotZero.html#1861" class="InductiveConstructor">intnz</a> <a id="1904" href="Agda.Builtin.Bool.html#182" class="InductiveConstructor">false</a>
+<a id="1910" class="Keyword">pattern</a> <a id="≢0"></a><a id="1918" href="IntegerProductNotZero.html#1918" class="InductiveConstructor">≢0</a> <a id="1921" class="Symbol">=</a> <a id="1923" href="IntegerProductNotZero.html#1861" class="InductiveConstructor">intnz</a> <a id="1929" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a>
+</pre>
+<h1 id="integer-multiplication">Integer multiplication</h1>
+<p>The multiplication of Int is the same as ℤ and the product of them is non zero if both integers are non zero.</p>
+<pre class="Agda"><a id="2080" class="Keyword">infixl</a> <a id="2087" class="Number">7</a> <a id="2089" href="IntegerProductNotZero.html#2094" class="Function Operator">_·_</a>
+
+<a id="_·_"></a><a id="2094" href="IntegerProductNotZero.html#2094" class="Function Operator">_·_</a> <a id="2098" class="Symbol">:</a> <a id="2100" href="IntegerProductNotZero.html#1566" class="Record">Int</a> <a id="2104" class="Symbol">→</a> <a id="2106" href="IntegerProductNotZero.html#1566" class="Record">Int</a> <a id="2110" class="Symbol">→</a> <a id="2112" href="IntegerProductNotZero.html#1566" class="Record">Int</a>
+<a id="2116" class="Symbol">(</a><a id="2117" href="IntegerProductNotZero.html#2117" class="Bound">x</a> <a id="2119" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟦</a> <a id="2121" href="IntegerProductNotZero.html#2121" class="Bound">nx</a> <a id="2124" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟧⟦</a> <a id="2127" href="IntegerProductNotZero.html#2127" class="Bound">nx≡</a> <a id="2131" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟧</a><a id="2132" class="Symbol">)</a> <a id="2134" href="IntegerProductNotZero.html#2094" class="Function Operator">·</a> <a id="2136" class="Symbol">(</a><a id="2137" href="IntegerProductNotZero.html#2137" class="Bound">y</a> <a id="2139" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟦</a> <a id="2141" href="IntegerProductNotZero.html#2141" class="Bound">ny</a> <a id="2144" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟧⟦</a> <a id="2147" href="IntegerProductNotZero.html#2147" class="Bound">ny≡</a> <a id="2151" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟧</a><a id="2152" class="Symbol">)</a>
+  <a id="2156" class="Symbol">=</a> <a id="2158" href="IntegerProductNotZero.html#2117" class="Bound">x</a> <a id="2160" href="Data.Integer.Base.html#5169" class="Function Operator">*</a> <a id="2162" href="IntegerProductNotZero.html#2137" class="Bound">y</a> <a id="2164" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟦</a> <a id="2166" href="IntegerProductNotZero.html#2121" class="Bound">nx</a> <a id="2169" href="Data.Bool.Base.html#986" class="Function Operator">∧</a> <a id="2171" href="IntegerProductNotZero.html#2141" class="Bound">ny</a> <a id="2174" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟧⟦</a> <a id="2177" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2179" href="IntegerProductNotZero.html#2117" class="Bound">x</a> <a id="2181" href="IntegerProductNotZero.html#2137" class="Bound">y</a> <a id="2183" href="IntegerProductNotZero.html#2121" class="Bound">nx</a> <a id="2186" href="IntegerProductNotZero.html#2141" class="Bound">ny</a> <a id="2189" class="Symbol">{</a><a id="2190" href="IntegerProductNotZero.html#2127" class="Bound">nx≡</a><a id="2193" class="Symbol">}</a> <a id="2195" class="Symbol">{</a><a id="2196" href="IntegerProductNotZero.html#2147" class="Bound">ny≡</a><a id="2199" class="Symbol">}</a> <a id="2201" href="IntegerProductNotZero.html#1596" class="InductiveConstructor Operator">⟧</a> <a id="2203" class="Keyword">where</a>
+</pre>
+<p>The hardest part is to prove that the product of <code>x</code> and <code>y</code> is non-zero if and only if x and y are non-zero.
+When both are non-zero, it is necessary to patten match when they are positive and negative.
+When one of them is zero, the product is zero by the definition of multiplication.
+It is necessary to do the rewrite when zero is multiplied on the right side.</p>
+<pre class="Agda">  <a id="2584" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2586" class="Symbol">:</a> <a id="2588" class="Symbol">∀</a> <a id="2590" href="IntegerProductNotZero.html#2590" class="Bound">x</a> <a id="2592" href="IntegerProductNotZero.html#2592" class="Bound">y</a> <a id="2594" href="IntegerProductNotZero.html#2594" class="Bound">nx</a> <a id="2597" href="IntegerProductNotZero.html#2597" class="Bound">ny</a> <a id="2600" class="Symbol">→</a> <a id="2602" class="Symbol">{</a><a id="2603" href="IntegerProductNotZero.html#1172" class="Function">NonZero?</a> <a id="2612" href="IntegerProductNotZero.html#2590" class="Bound">x</a> <a id="2614" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2616" href="IntegerProductNotZero.html#2594" class="Bound">nx</a><a id="2618" class="Symbol">}</a> <a id="2620" class="Symbol">→</a> <a id="2622" class="Symbol">{</a><a id="2623" href="IntegerProductNotZero.html#1172" class="Function">NonZero?</a> <a id="2632" href="IntegerProductNotZero.html#2592" class="Bound">y</a> <a id="2634" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2636" href="IntegerProductNotZero.html#2597" class="Bound">ny</a><a id="2638" class="Symbol">}</a>
+    <a id="2644" class="Symbol">→</a> <a id="2646" href="IntegerProductNotZero.html#1172" class="Function">NonZero?</a> <a id="2655" class="Symbol">(</a><a id="2656" href="IntegerProductNotZero.html#2590" class="Bound">x</a> <a id="2658" href="Data.Integer.Base.html#5169" class="Function Operator">*</a> <a id="2660" href="IntegerProductNotZero.html#2592" class="Bound">y</a><a id="2661" class="Symbol">)</a> <a id="2663" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="2665" href="IntegerProductNotZero.html#2594" class="Bound">nx</a> <a id="2668" href="Data.Bool.Base.html#986" class="Function Operator">∧</a> <a id="2670" href="IntegerProductNotZero.html#2597" class="Bound">ny</a>
+  <a id="2675" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2677" href="IntegerProductNotZero.html#965" class="InductiveConstructor">+z</a> <a id="2680" href="IntegerProductNotZero.html#965" class="InductiveConstructor">+z</a> <a id="2683" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2688" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2693" class="Symbol">=</a> <a id="2695" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="2702" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2704" href="IntegerProductNotZero.html#965" class="InductiveConstructor">+z</a> <a id="2707" href="IntegerProductNotZero.html#987" class="InductiveConstructor">-z</a> <a id="2710" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2715" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2720" class="Symbol">=</a> <a id="2722" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="2729" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2731" href="IntegerProductNotZero.html#987" class="InductiveConstructor">-z</a> <a id="2734" href="IntegerProductNotZero.html#965" class="InductiveConstructor">+z</a> <a id="2737" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2742" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2747" class="Symbol">=</a> <a id="2749" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="2756" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2758" href="IntegerProductNotZero.html#987" class="InductiveConstructor">-z</a> <a id="2761" href="IntegerProductNotZero.html#987" class="InductiveConstructor">-z</a> <a id="2764" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2769" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2774" class="Symbol">=</a> <a id="2776" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="2783" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2785" href="Data.Integer.Base.html#1444" class="InductiveConstructor">+0</a> <a id="2788" href="IntegerProductNotZero.html#2788" class="Bound">y</a>  <a id="2791" href="Agda.Builtin.Bool.html#182" class="InductiveConstructor">false</a> <a id="2797" class="Symbol">_</a>   <a id="2801" class="Symbol">=</a> <a id="2803" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="2810" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2812" href="Data.Integer.Base.html#1467" class="InductiveConstructor Operator">+[1+</a> <a id="2817" href="IntegerProductNotZero.html#2817" class="Bound">n</a> <a id="2819" href="Data.Integer.Base.html#1467" class="InductiveConstructor Operator">]</a> <a id="2821" href="Data.Integer.Base.html#1444" class="InductiveConstructor">+0</a> <a id="2824" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2829" href="Agda.Builtin.Bool.html#182" class="InductiveConstructor">false</a> <a id="2835" class="Keyword">rewrite</a> <a id="2843" href="Data.Integer.Properties.html#43383" class="Function">*-comm</a> <a id="2850" href="Data.Integer.Base.html#1467" class="InductiveConstructor Operator">+[1+</a> <a id="2855" href="IntegerProductNotZero.html#2817" class="Bound">n</a> <a id="2857" href="Data.Integer.Base.html#1467" class="InductiveConstructor Operator">]</a> <a id="2859" href="Data.Integer.Base.html#1444" class="InductiveConstructor">+0</a> <a id="2862" class="Symbol">=</a> <a id="2864" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+  <a id="2871" href="IntegerProductNotZero.html#2584" class="Function">α</a> <a id="2873" href="Agda.Builtin.Int.html#291" class="InductiveConstructor Operator">-[1+</a> <a id="2878" href="IntegerProductNotZero.html#2878" class="Bound">n</a> <a id="2880" href="Agda.Builtin.Int.html#291" class="InductiveConstructor Operator">]</a> <a id="2882" href="Data.Integer.Base.html#1444" class="InductiveConstructor">+0</a> <a id="2885" href="Agda.Builtin.Bool.html#188" class="InductiveConstructor">true</a> <a id="2890" href="Agda.Builtin.Bool.html#182" class="InductiveConstructor">false</a> <a id="2896" class="Keyword">rewrite</a> <a id="2904" href="Data.Integer.Properties.html#43383" class="Function">*-comm</a> <a id="2911" href="Agda.Builtin.Int.html#291" class="InductiveConstructor Operator">-[1+</a> <a id="2916" href="IntegerProductNotZero.html#2878" class="Bound">n</a> <a id="2918" href="Agda.Builtin.Int.html#291" class="InductiveConstructor Operator">]</a> <a id="2920" href="Data.Integer.Base.html#1444" class="InductiveConstructor">+0</a> <a id="2923" class="Symbol">=</a> <a id="2925" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+</pre>
+<h1 id="final-theorem">Final theorem</h1>
+<p>This theorem is necessary to solve a problem of rational numbers.
+Let two equals rational numbers <code>p = w ÷ x</code> and <code>q = z ÷ y</code>.
+Both <code>x</code> and <code>y</code> are non-zero because they are denominators of rational numbers.
+Because they are equal, <code>w * y = z * x</code>.</p>
+<p>I was creating a function to figure out if a rational number is zero or not using quotient types in Cubical Agda.
+They are zero if the numerator is zero.
+And in Cubical Agda, I have to prove that all rational numbers that are equal to this one have the same property.
+In the end, I have to solve this theorem below.</p>
+<p>Because of the definitions that I made above, there are just two cases of this product <code>w * y = z * x</code>.
+When both <code>w</code> and <code>z</code> are zero or different than zero.</p>
+<pre class="Agda"><a id="theoProd"></a><a id="3683" href="IntegerProductNotZero.html#3683" class="Function">theoProd</a> <a id="3692" class="Symbol">:</a> <a id="3694" class="Symbol">∀</a> <a id="3696" href="IntegerProductNotZero.html#3696" class="Bound">x</a> <a id="3698" href="IntegerProductNotZero.html#3698" class="Bound">y</a> <a id="3700" href="IntegerProductNotZero.html#3700" class="Bound">w</a> <a id="3702" href="IntegerProductNotZero.html#3702" class="Bound">z</a> <a id="3704" class="Symbol">→</a> <a id="3706" class="Symbol">{</a><a id="3707" href="IntegerProductNotZero.html#1688" class="Function">NonZero</a> <a id="3715" href="IntegerProductNotZero.html#3696" class="Bound">x</a><a id="3716" class="Symbol">}</a> <a id="3718" class="Symbol">→</a> <a id="3720" class="Symbol">{</a><a id="3721" href="IntegerProductNotZero.html#1688" class="Function">NonZero</a> <a id="3729" href="IntegerProductNotZero.html#3698" class="Bound">y</a><a id="3730" class="Symbol">}</a>
+  <a id="3734" class="Symbol">→</a> <a id="3736" class="Symbol">{</a> <a id="3738" href="IntegerProductNotZero.html#3700" class="Bound">w</a> <a id="3740" href="IntegerProductNotZero.html#2094" class="Function Operator">·</a> <a id="3742" href="IntegerProductNotZero.html#3698" class="Bound">y</a> <a id="3744" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="3746" href="IntegerProductNotZero.html#3702" class="Bound">z</a> <a id="3748" href="IntegerProductNotZero.html#2094" class="Function Operator">·</a> <a id="3750" href="IntegerProductNotZero.html#3696" class="Bound">x</a> <a id="3752" class="Symbol">}</a>  <a id="3755" class="Symbol">→</a> <a id="3757" href="IntegerProductNotZero.html#1628" class="Field">nonZero?</a> <a id="3766" href="IntegerProductNotZero.html#3700" class="Bound">w</a> <a id="3768" href="Agda.Builtin.Equality.html#151" class="Datatype Operator">≡</a> <a id="3770" href="IntegerProductNotZero.html#1628" class="Field">nonZero?</a> <a id="3779" href="IntegerProductNotZero.html#3702" class="Bound">z</a>
+<a id="3781" href="IntegerProductNotZero.html#3683" class="Function">theoProd</a> <a id="3790" href="IntegerProductNotZero.html#1918" class="InductiveConstructor">≢0</a> <a id="3793" href="IntegerProductNotZero.html#1918" class="InductiveConstructor">≢0</a> <a id="3796" href="IntegerProductNotZero.html#1893" class="InductiveConstructor">≡0</a> <a id="3799" href="IntegerProductNotZero.html#1893" class="InductiveConstructor">≡0</a> <a id="3802" class="Symbol">=</a> <a id="3804" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+<a id="3809" href="IntegerProductNotZero.html#3683" class="Function">theoProd</a> <a id="3818" href="IntegerProductNotZero.html#1918" class="InductiveConstructor">≢0</a> <a id="3821" href="IntegerProductNotZero.html#1918" class="InductiveConstructor">≢0</a> <a id="3824" href="IntegerProductNotZero.html#1918" class="InductiveConstructor">≢0</a> <a id="3827" href="IntegerProductNotZero.html#1918" class="InductiveConstructor">≢0</a> <a id="3830" class="Symbol">=</a> <a id="3832" href="Agda.Builtin.Equality.html#208" class="InductiveConstructor">refl</a>
+</pre>
+<p>In the end, making a record with a boolean make it
+possible to just pattern match in the cases that a number is zero or not.</p>
+    </section>
+</article>
+
+        </main>
+
+        <footer>
+            Site proudly generated by
+            <a style="color:yellow;" href="http://jaspervdj.be/hakyll">Hakyll</a> with
+            <a style="color:yellow;" href="https://github.com/guilhermehas/guilhermehas.github.io">source code</a>
+        </footer>
+    </body>
+</html>
