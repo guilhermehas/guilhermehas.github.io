@@ -1,13 +1,13 @@
 ---
 date: 2022-06-06
-title: Using pattern match in your favor
+title: Using pattern-match in your favor
 author: Guilherme
 ---
 
 # Motivation
 
 When I was proving a theorem of multiplication of two national numbers in Cubical Agda,
-I had to pattern match integers in 3 cases (positive, negative and zero).
+I had to pattern-match integers in 3 cases (positive, negative, and zero).
 However, I would like to pattern match them in just two cases: zero or not zero.
 For that, it is necessary to create a record with that information and I will show it below.
 
@@ -26,10 +26,6 @@ open import Data.Integer renaming (NonZero to NonZeroℤ)
 open import Data.Integer.Properties
 open import Relation.Nullary
 open import Relation.Binary.PropositionalEquality
-
-private variable
-  z : ℤ
-
 ```
 
 # Creating patterns
@@ -44,7 +40,7 @@ pattern -z = -[1+ _ ]
 # Non zero definition
 
 Because of the way that integers are defined in the library,
-it is necessary to break it in 3 cases to figure out if it is zero or not.
+it is necessary to break it into 3 cases to figure out if it is zero or not.
 
 ```
 NonZero? : ℤ → Bool
@@ -88,7 +84,7 @@ pattern ≢0 = intnz true
 
 # Integer multiplication
 
-The multiplication of Int are the same of ℤ and the product of them are non zero if both integers are non zero.
+The multiplication of Int is the same as ℤ and the product of them is non zero if both integers are non zero.
 
 ```
 infixl 7 _·_
@@ -98,10 +94,10 @@ _·_ : Int → Int → Int
   = x * y ⟦ nx ∧ ny ⟧⟦ α x y nx ny {nx≡} {ny≡} ⟧ where
 ```
 
-The hardest part is to prove that the product of x and y are non zero if and only if x and y are non zero.
-When both are non zero, it is necessary to patten match when they are positive and negative.
+The hardest part is to prove that the product of `x` and `y` is non-zero if and only if x and y are non-zero.
+When both are non-zero, it is necessary to patten match when they are positive and negative.
 When one of them is zero, the product is zero by the definition of multiplication.
-It is necessary to do the rewrite when zero is multiplied in the right side.
+It is necessary to do the rewrite when zero is multiplied on the right side.
 
 ```
   α : ∀ x y nx ny → {NonZero? x ≡ nx} → {NonZero? y ≡ ny}
@@ -119,7 +115,7 @@ It is necessary to do the rewrite when zero is multiplied in the right side.
 
 This theorem is necessary to solve a problem of rational numbers.
 Let two equals rational numbers `p = w ÷ x` and `q = z ÷ y`.
-Both `x` and `y` are non zero because they are denominators of rational numbers.
+Both `x` and `y` are non-zero because they are denominators of rational numbers.
 Because they are equal, `w * y = z * x`.
 
 I was creating a function to figure out if a rational number is zero or not using quotient types in Cubical Agda.
@@ -128,8 +124,7 @@ And in Cubical Agda, I have to prove that all rational numbers that are equal to
 In the end, I have to solve this theorem below.
 
 Because of the definitions that I made above, there are just two cases of this product `w * y = z * x`.
-When both `w` and `z` are zero or different than zero. In the end, making a record with a boolean make it
-possible to just pattern match in the cases that a number is zero or not.
+When both `w` and `z` are zero or different than zero.
 
 ```
 theoProd : ∀ x y w z → {NonZero x} → {NonZero y}
@@ -137,3 +132,6 @@ theoProd : ∀ x y w z → {NonZero x} → {NonZero y}
 theoProd ≢0 ≢0 ≡0 ≡0 = refl
 theoProd ≢0 ≢0 ≢0 ≢0 = refl
 ```
+
+In the end, making a record with a boolean make it
+possible to just pattern match in the cases that a number is zero or not.
