@@ -106,7 +106,7 @@ It is necessary to do the rewrite when zero is multiplied on the right side.
   α +z -z true true = refl
   α -z +z true true = refl
   α -z -z true true = refl
-  α +0 y  false _   = refl
+  α +0 _  false _   = refl
   α +[1+ n ] +0 true false rewrite *-comm +[1+ n ] +0 = refl
   α -[1+ n ] +0 true false rewrite *-comm -[1+ n ] +0 = refl
 ```
