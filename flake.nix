@@ -30,9 +30,13 @@
         })
       ];
       pkgs = import nixpkgs { inherit system overlays; };
+      builds = pkgs: with pkgs; { inherit blogToolProject agda-all blogProject; };
+      builds' = pkgs: with pkgs; [ blogToolProject agda-all ];
     in  rec {
-      # Built by `nix build .`
-      packages = with pkgs; { inherit blogToolProject agda-all blogProject; };
+      packages = builds pkgs;
+      devShell = pkgs.mkShell {
+        buildInputs = builds' pkgs;
+      };
       defaultPackage = pkgs.blogProject;
     });
 }
