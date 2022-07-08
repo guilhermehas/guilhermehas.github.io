@@ -22,8 +22,8 @@ open import Relation.Binary.PropositionalEquality hiding ([_])
 open import Data.Product
 open import Data.List
 open import Data.Maybe
-open import Codata.Thunk
-open import Codata.Stream using (Stream; _∷_; repeat)
+open import Codata.Sized.Thunk
+open import Codata.Sized.Stream using (Stream; _∷_; repeat)
 ```
 
 # Defining the language

@@ -38,7 +38,7 @@ open import Data.Integer.Instances
 open import Data.Fin
 open import Data.Fin.Properties renaming (_≟_ to _≟f_)
 open import Relation.Binary
-open import Relation.Binary.PropositionalEquality hiding (Extensionality)
+open import Relation.Binary.PropositionalEquality
 open import Relation.Nullary
 open import Relation.Nullary.Decidable
 open import Function

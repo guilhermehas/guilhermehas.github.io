@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "cubical-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1657118863,
+        "narHash": "sha256-LiXdKgk70cgULv4+M19TSFQQSz0N6z+f41qCAttU0Bo=",
+        "owner": "agda",
+        "repo": "cubical",
+        "rev": "61c3428cbc0b3300278d5ff8d297b1ea74e6d01a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "agda",
+        "repo": "cubical",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "locked": {
         "lastModified": 1653893745,
@@ -29,8 +45,26 @@
     },
     "root": {
       "inputs": {
+        "cubical-src": "cubical-src",
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": "nixpkgs",
+        "stdlib-src": "stdlib-src"
+      }
+    },
+    "stdlib-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1656678146,
+        "narHash": "sha256-CT8EqYgNzEnAGI0mLwM1ZyKCHPcq4i9xnjCp+dJgdWI=",
+        "owner": "agda",
+        "repo": "agda-stdlib",
+        "rev": "69c93f587822acc69b5a1a123841a5c2420347d1",
+        "type": "github"
+      },
+      "original": {
+        "owner": "agda",
+        "repo": "agda-stdlib",
+        "type": "github"
       }
     }
   },
