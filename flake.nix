@@ -31,7 +31,7 @@
             standard-library = prev.agdaPackages.standard-library.overrideAttrs (_: {src = stdlib-src;});
           };
           blogToolProject = prev.haskellPackages.callPackage ./cabal.nix {};
-          agda-all = prev.agda.withPackages (with agdaNewPackages; [ cubical standard-library ]);
+          agda-all = prev.agda.withPackages (with agdaNewPackages; p: [ cubical standard-library ]);
           blogProject = with prev; stdenv.mkDerivation {
             name = "guilherme-blog";
             src = my-src;

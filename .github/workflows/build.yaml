@@ -15,6 +15,9 @@ jobs:
             experimental-features = nix-command flakes
             substituters = https://cache.nixos.org/ https://hydra.iohk.io https://guilherme.cachix.org
             trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ= guilherme.cachix.org-1:gCM9KYeDP7G+CaCHc8mWETo41u0XBac56D2OrTtJ2ZQ=' > ~/.config/nix/nix.conf
+      - uses: cachix/cachix-action@v8
+        with:
+          name: guilherme
       - name: Build
         run:  nix build -v --print-build-logs
       - uses: peaceiris/actions-gh-pages@v3
