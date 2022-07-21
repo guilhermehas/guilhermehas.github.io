@@ -3,15 +3,16 @@
     "cubical-src": {
       "flake": false,
       "locked": {
-        "lastModified": 1657118863,
-        "narHash": "sha256-LiXdKgk70cgULv4+M19TSFQQSz0N6z+f41qCAttU0Bo=",
-        "owner": "agda",
+        "lastModified": 1658371673,
+        "narHash": "sha256-9DZ1v6guNx2LiqSqsy4MvRqC9j3ksFAC2u8UEW7F/pk=",
+        "owner": "guilhermehas",
         "repo": "cubical",
-        "rev": "61c3428cbc0b3300278d5ff8d297b1ea74e6d01a",
+        "rev": "bfb0bcb1cc93aab111311198b7ba3f75ec91d52b",
         "type": "github"
       },
       "original": {
-        "owner": "agda",
+        "owner": "guilhermehas",
+        "ref": "no-unicode",
         "repo": "cubical",
         "type": "github"
       }

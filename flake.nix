@@ -3,7 +3,7 @@
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
     cubical-src = {
-      url = github:agda/cubical;
+      url = github:guilhermehas/cubical/no-unicode;
       flake = false;
     };
     stdlib-src = {
@@ -35,6 +35,7 @@
           blogProject = with prev; stdenv.mkDerivation {
             name = "guilherme-blog";
             src = my-src;
+            LC_ALL = "en_US.UTF-8";
             buildInputs = with final; [ agda-all blogToolProject ];
 
             buildPhase = ''site build'';
