@@ -1,0 +1,14 @@
+<!DOCTYPE HTML>
+<html><head><meta charset="utf-8"><title>Cubical.Syntax.Syntax</title><link rel="stylesheet" href="Agda.css"></head><body><pre class="Agda"><a id="1" class="Symbol">{-#</a> <a id="5" class="Keyword">OPTIONS</a> <a id="13" class="Pragma">--safe</a> <a id="20" class="Symbol">#-}</a>
+<a id="24" class="Keyword">module</a> <a id="31" href="Cubical.Syntax.Syntax.html" class="Module">Cubical.Syntax.Syntax</a> <a id="53" class="Keyword">where</a>
+
+<a id="60" class="Keyword">open</a> <a id="65" class="Keyword">import</a> <a id="72" href="Cubical.Core.Primitives.html" class="Module">Cubical.Core.Primitives</a>
+
+<a id="97" class="Comment">-- A syntax typeclass for types which contain a &quot;carrier&quot; type in the</a>
+<a id="167" class="Comment">-- sence of an algebraic structure.</a>
+<a id="203" class="Keyword">record</a> <a id="has-⟨⟩"></a><a id="210" href="Cubical.Syntax.Syntax.html#210" class="Record">has-⟨⟩</a> <a id="217" class="Symbol">{</a><a id="218" href="Cubical.Syntax.Syntax.html#218" class="Bound">ℓᵢ</a> <a id="221" href="Cubical.Syntax.Syntax.html#221" class="Bound">ℓc</a><a id="223" class="Symbol">}</a> <a id="225" class="Symbol">(</a><a id="226" href="Cubical.Syntax.Syntax.html#226" class="Bound">Instance</a> <a id="235" class="Symbol">:</a> <a id="237" href="Agda.Primitive.html#326" class="Primitive">Type</a> <a id="242" href="Cubical.Syntax.Syntax.html#218" class="Bound">ℓᵢ</a><a id="244" class="Symbol">)</a> <a id="246" class="Symbol">:</a> <a id="248" href="Agda.Primitive.html#326" class="Primitive">Type</a> <a id="253" class="Symbol">(</a><a id="254" href="Agda.Primitive.html#810" class="Primitive">ℓ-max</a> <a id="260" href="Cubical.Syntax.Syntax.html#218" class="Bound">ℓᵢ</a> <a id="263" class="Symbol">(</a><a id="264" href="Agda.Primitive.html#780" class="Primitive">ℓ-suc</a> <a id="270" href="Cubical.Syntax.Syntax.html#221" class="Bound">ℓc</a><a id="272" class="Symbol">))</a> <a id="275" class="Keyword">where</a>
+  <a id="283" class="Keyword">field</a>
+    <a id="has-⟨⟩.⟨_⟩"></a><a id="293" href="Cubical.Syntax.Syntax.html#293" class="Field Operator">⟨_⟩</a> <a id="297" class="Symbol">:</a> <a id="299" href="Cubical.Syntax.Syntax.html#226" class="Bound">Instance</a> <a id="308" class="Symbol">→</a> <a id="310" href="Agda.Primitive.html#326" class="Primitive">Type</a> <a id="315" href="Cubical.Syntax.Syntax.html#221" class="Bound">ℓc</a>
+
+<a id="319" class="Keyword">open</a> <a id="324" href="Cubical.Syntax.Syntax.html#210" class="Module">has-⟨⟩</a> <a id="331" class="Symbol">⦃</a> <a id="333" class="Symbol">…</a> <a id="335" class="Symbol">⦄</a> <a id="337" class="Keyword">public</a>
+</pre></body></html>
