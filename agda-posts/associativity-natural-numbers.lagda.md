@@ -17,7 +17,7 @@ I will use this to prove that natural numbers without zero can be defined using 
 Importing Cubical Libraries:
 
 ```
-{-# OPTIONS --cubical #-}
+{-# OPTIONS --cubical --guardedness #-}
 
 open import Agda.Primitive
 open import Cubical.Foundations.Prelude

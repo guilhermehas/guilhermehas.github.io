@@ -18,7 +18,7 @@ In this post, I will create a data structure in cubical Agda that has compressed
 Importing Cubical Libraries:
 
 ```
-{-# OPTIONS --cubical #-}
+{-# OPTIONS --cubical --guardedness #-}
 
 open import Cubical.Relation.Nullary.Base
 open import Cubical.Relation.Nullary.Properties
