@@ -30,7 +30,7 @@ approach performs the copying lazily and only on-demand. We also proved that
 our lazy copy is observationally equivalent to the eager version. The verification
 approach described in *Deductive verification of Solidity smart contracts with SSCalc* is based on these semantics.
 
-Jiao Jiao, Shang{-}Wei Lin and Jun Sun developed an operational semantics for Solidity within
+Jiao Jiao, Shang-Wei Lin and Jun Sun developed an operational semantics for Solidity within
 the K-framework. The semantics is less abstract and closer to low-level
 representations. To the best of our understanding, they model both memory
 and storage as a list/mapping from addresses to values.
