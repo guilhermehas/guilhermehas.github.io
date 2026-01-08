@@ -2,17 +2,10 @@
   description = "Guilherme blog";
   inputs = {
     flake-utils.url = "github:numtide/flake-utils";
-    cubical-src = {
-      url = github:guilhermehas/cubical/no-unicode;
-      flake = false;
-    };
-    stdlib-src = {
-      url = github:agda/agda-stdlib;
-      flake = false;
-    };
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
-  outputs = { self, nixpkgs, flake-utils, cubical-src, stdlib-src }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachSystem [ "x86_64-linux" "x86_64-darwin" ] (system:
     let
       overlays = [
@@ -26,12 +19,8 @@
           my-src = ./.;
 
           in rec {
-          agdaNewPackages = {
-            cubical = prev.agdaPackages.cubical.overrideAttrs (_: {src = cubical-src;});
-            standard-library = prev.agdaPackages.standard-library.overrideAttrs (_: {src = stdlib-src;});
-          };
           blogToolProject = prev.haskellPackages.callPackage ./cabal.nix {};
-          agda-all = prev.agda.withPackages (with agdaNewPackages; p: [ cubical standard-library ]);
+          agda-all = prev.agda.withPackages (p: with p; [ cubical standard-library ]);
           blogProject = with prev; stdenv.mkDerivation {
             name = "guilherme-blog";
             src = my-src;

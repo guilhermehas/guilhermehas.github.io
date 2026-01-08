@@ -1,22 +1,5 @@
 {
   "nodes": {
-    "cubical-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1658371673,
-        "narHash": "sha256-9DZ1v6guNx2LiqSqsy4MvRqC9j3ksFAC2u8UEW7F/pk=",
-        "owner": "guilhermehas",
-        "repo": "cubical",
-        "rev": "bfb0bcb1cc93aab111311198b7ba3f75ec91d52b",
-        "type": "github"
-      },
-      "original": {
-        "owner": "guilhermehas",
-        "ref": "no-unicode",
-        "repo": "cubical",
-        "type": "github"
-      }
-    },
     "flake-utils": {
       "locked": {
         "lastModified": 1653893745,
@@ -34,38 +17,24 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 0,
-        "narHash": "sha256-TwEeh4r50NdWHFAHQSyjCk2cZxgwUfcCCAJOhPdXB28=",
-        "path": "/nix/store/hyinwqr1byiwwgzdc32yvqi3ih1hssbh-source",
-        "type": "path"
+        "lastModified": 1767799921,
+        "narHash": "sha256-r4GVX+FToWVE2My8VVZH4V0pTIpnu2ZE8/Z4uxGEMBE=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "d351d0653aeb7877273920cd3e823994e7579b0b",
+        "type": "github"
       },
       "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
+        "owner": "NixOS",
+        "ref": "nixos-25.11",
+        "repo": "nixpkgs",
+        "type": "github"
       }
     },
     "root": {
       "inputs": {
-        "cubical-src": "cubical-src",
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs",
-        "stdlib-src": "stdlib-src"
-      }
-    },
-    "stdlib-src": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1656678146,
-        "narHash": "sha256-CT8EqYgNzEnAGI0mLwM1ZyKCHPcq4i9xnjCp+dJgdWI=",
-        "owner": "agda",
-        "repo": "agda-stdlib",
-        "rev": "69c93f587822acc69b5a1a123841a5c2420347d1",
-        "type": "github"
-      },
-      "original": {
-        "owner": "agda",
-        "repo": "agda-stdlib",
-        "type": "github"
+        "nixpkgs": "nixpkgs"
       }
     }
   },
