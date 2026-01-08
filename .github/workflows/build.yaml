@@ -5,18 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2.3.4
-      - name: Nix Config
-        run: |
-          mkdir -p ~/.config/nix/
-          echo '
-            experimental-features = nix-command flakes
-            substituters = https://cache.nixos.org/ https://hydra.iohk.io https://guilherme.cachix.org
-            trusted-public-keys = cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY= hydra.iohk.io:f/Ea+s+dFdN+3Y/G+FDgSq+a5NEWhJGzdjvKNGv0/EQ= guilherme.cachix.org-1:KWZrB5iF9L+OiNs8jxnaH0ZUEOr5DOvE4IRniI2CM+o=' > ~/.config/nix/nix.conf
       - name: Install Nix
         uses: cachix/install-nix-action@v27
         with:
-            extra_nix_config: |
-            experimental-features = nix-command flakes
+            extra_nix_config: experimental-features = nix-command flakes
       - name: Build
         run:  nix build -v --print-build-logs
       - uses: peaceiris/actions-gh-pages@v3
