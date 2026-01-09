@@ -4,6 +4,12 @@ title: KeYther
 author: Guilherme
 ---
 
+# Achievements
+
+It is a great news that we published *An Axiomatisation of Solidity Memory and Storage* in the 
+23rd International Conference on Software Engineering and Formal Methods.
+
+
 # Introduction
 
 KeYther is a theorem prover that I am creating for Solidity, which is the main programming language for the biggest smart contract plataform: Ethereum. KeYther is based on KeY system, that is used to verify Java programs using dynamic logic (which is a proof calculus on symbolic execution).
