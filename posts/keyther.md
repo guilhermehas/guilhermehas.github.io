@@ -18,6 +18,7 @@ The basis of a program logic for a programming language is the formalisation of 
 
 In our work, we formalised a model of volatile memory that works like a memory table with pointers. Because of that, the copy is shallow. In addition, Solidty has arbitrarily nested data structures.
 Therefore, the formalisation creates an identity for each sub-structure, and nested structures are formalised as a list of fields.
+In addition, sub-structures that were never created are assigned to default values when trying to read them in the point the main structured was created in the symbolic execution.
 
 ## Storage
 
@@ -25,6 +26,8 @@ The permanent storage works as value data. Therefore, every copy is a deep copy.
 
 - In the eager formalisation, the storage is formalised as a tree, which is more intuitive.
 - In the lazy formalisation, the storage is formalised as a list of key-pathes and values. So it has a flat data structure.
+
+The permanent storage also has default values, but it works a little bit different than in the memory. The default value of a record field is the empty struct, and the default value of any concrete type (such as integers and strings) are the usual ones.
 
 ## Copying between Storage and Memory
 
